@@ -292,16 +292,22 @@ fun ErrorState(
 }
 
 /**
- * The key is valid but its project has no billing account.
+ * The Places call was refused for a reason no user action can fix: billing off,
+ * API not enabled, or the key restricted away from Places.
  *
  * This gets its own state rather than folding into [ErrorState] because the cause
- * and the cure are completely different: nothing about the device, network or app
- * is wrong, and no amount of retrying will help. Places API (New) and the Maps SDK
- * both return zero data until billing is attached -- a valid key alone is not
- * enough, which is the single most confusing thing about setting this app up.
+ * and the cure are completely different -- nothing about the device, network or app
+ * is wrong, and retrying will never help.
+ *
+ * [diagnostic] is Google's own reason code, shown verbatim. It looks technical
+ * because it is: these failures are indistinguishable from the outside, and an
+ * earlier version that paraphrased them all as "enable billing" sent debugging
+ * after a setting that was already correct.
  */
 @Composable
-fun BillingRequiredState(
+fun SetupRequiredState(
+    message: String,
+    diagnostic: String?,
     onBackToMap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -327,28 +333,29 @@ fun BillingRequiredState(
         }
         Spacer(Modifier.height(14.dp))
         Text(
-            text = "Billing's not switched on",
+            text = "Kitchen's not set up",
             style = NommitType.TitleLarge,
             color = NommitColors.Ink,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = "Restaurant search needs billing enabled on the Google Cloud project.",
+            text = message,
             style = NommitType.Body,
             color = NommitColors.InkMuted,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 280.dp),
         )
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = "Console → Billing → link a billing account to the key's project. " +
-                "There's a monthly free allotment, so this stays free at this scale.",
-            style = NommitType.StampSmall,
-            color = NommitColors.InkFaint,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.widthIn(max = 280.dp),
-        )
+        if (diagnostic != null) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "Google says: $diagnostic",
+                style = NommitType.StampSmall,
+                color = NommitColors.InkFaint,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.widthIn(max = 280.dp),
+            )
+        }
         Spacer(Modifier.height(20.dp))
         Text(
             text = "← back to map",

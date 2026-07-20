@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -35,6 +36,23 @@ object NetworkModule {
     fun providePlacesOkHttp(keyInterceptor: PlacesApiKeyInterceptor): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(keyInterceptor)
+            .apply {
+                // Debug builds log the full request and response body, because a
+                // Places failure is almost always a console-config problem whose
+                // only real evidence is the `reason` string Google returns.
+                //
+                // The API key header is redacted: this log goes to logcat, which is
+                // readable by anyone with the device attached, and a leaked key is
+                // billable to the project that owns it.
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            level = HttpLoggingInterceptor.Level.BODY
+                            redactHeader(PlacesHeaders.API_KEY)
+                        },
+                    )
+                }
+            }
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

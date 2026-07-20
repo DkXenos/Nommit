@@ -37,7 +37,7 @@ import com.example.nommit.feature.discovery.ui.map.MapLayer
 import com.example.nommit.feature.discovery.ui.map.SearchControls
 import com.example.nommit.feature.discovery.ui.map.SearchHeader
 import com.example.nommit.feature.discovery.ui.results.ResultsSheet
-import com.example.nommit.feature.discovery.ui.states.BillingRequiredState
+import com.example.nommit.feature.discovery.ui.states.SetupRequiredState
 import com.example.nommit.feature.discovery.ui.states.EmptyState
 import com.example.nommit.feature.discovery.ui.states.ErrorState
 import com.example.nommit.feature.discovery.ui.states.LocationDeniedScreen
@@ -143,8 +143,12 @@ fun DiscoveryScreen(
                 )
             }
 
-            DiscoveryPhase.BillingRequired -> BottomPanel {
-                BillingRequiredState(onBackToMap = viewModel::onBackToMap)
+            DiscoveryPhase.SetupRequired -> BottomPanel {
+                SetupRequiredState(
+                    message = state.errorMessage ?: "Places isn't configured for this key.",
+                    diagnostic = state.errorDiagnostic,
+                    onBackToMap = viewModel::onBackToMap,
+                )
             }
 
             DiscoveryPhase.Error -> BottomPanel {

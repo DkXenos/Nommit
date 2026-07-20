@@ -40,11 +40,11 @@ enum class DiscoveryPhase {
     Error,
 
     /**
-     * The key is fine but its Google Cloud project has no billing account, so
-     * Places returns nothing at all. Distinct from [Error] because the fix is a
-     * console setting, not a retry.
+     * The request never had a chance: billing off, API not enabled, or the key
+     * restricted away from Places. Distinct from [Error] because the fix is a
+     * Google Cloud Console setting, and retrying will never help.
      */
-    BillingRequired,
+    SetupRequired,
 }
 
 /**
@@ -74,6 +74,9 @@ data class DiscoveryUiState(
 
     val errorMessage: String? = null,
 
+    /** Google's own reason code, shown verbatim so we never debug our own paraphrase. */
+    val errorDiagnostic: String? = null,
+
     /**
      * True while a background probe is refreshing the cuisine chips. Distinct from
      * the [DiscoveryPhase.Nomming] phase: the probe is silent, the Nom is theatre.
@@ -100,7 +103,7 @@ data class DiscoveryUiState(
             DiscoveryPhase.Detail,
             DiscoveryPhase.Empty,
             DiscoveryPhase.Error,
-            DiscoveryPhase.BillingRequired,
+            DiscoveryPhase.SetupRequired,
         )
 
     /** Pins only make sense once there is a result set behind them. */

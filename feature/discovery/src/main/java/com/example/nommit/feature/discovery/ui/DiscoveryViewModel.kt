@@ -184,12 +184,13 @@ class DiscoveryViewModel @Inject constructor(
 
                 is Outcome.Error -> _state.update {
                     it.copy(
-                        phase = if (outcome.kind == ErrorKind.Billing) {
-                            DiscoveryPhase.BillingRequired
+                        phase = if (outcome.kind == ErrorKind.Configuration) {
+                            DiscoveryPhase.SetupRequired
                         } else {
                             DiscoveryPhase.Error
                         },
                         errorMessage = outcome.message,
+                        errorDiagnostic = outcome.diagnostic,
                     )
                 }
 

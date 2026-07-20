@@ -102,36 +102,86 @@ class DiscoveryRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Distinguishes "billing isn't on" from every other HTTP failure.
+     * Reads Google's own `status` and `details[].reason` out of the error body and
+     * reports what it actually says.
      *
-     * This matters more than it looks: Places API (New) returns *nothing at all*
-     * until a billing account is attached to the key's project, so on a billing-free
-     * project every search fails this way. Reported generically it looks like a dead
-     * network and sends you debugging the wrong thing entirely.
+     * The previous version pattern-matched a handful of substrings and called every
+     * 403 a billing problem. That was wrong in a way that actively misled: a key
+     * whose API-restriction list simply omitted Places API (New) came back as
+     * `API_KEY_SERVICE_BLOCKED`, and the app confidently reported "enable billing"
+     * on a project whose billing was already enabled. Anything not recognised below
+     * now surfaces the raw reason instead of being guessed at.
      */
     private fun HttpException.toOutcome(): Outcome<Nothing> {
         val body = runCatching { response()?.errorBody()?.string() }.getOrNull().orEmpty()
-        val looksLikeBilling = BILLING_MARKERS.any { body.contains(it, ignoreCase = true) }
+        val reason = body.extractJsonString("reason")
+        val status = body.extractJsonString("status")
+        val apiMessage = body.extractJsonString("message")
+        val marker = reason ?: status
+
+        fun config(message: String) = Outcome.Error(message, this, ErrorKind.Configuration, marker)
 
         return when {
-            code() == 402 || (code() == 403 && looksLikeBilling) -> Outcome.Error(
-                message = "Restaurant search needs billing enabled on the Google Cloud project.",
-                cause = this,
-                kind = ErrorKind.Billing,
+            // The key exists and is valid, but its API-restriction list doesn't
+            // include this service. Distinct from the API being disabled project-wide.
+            reason == "API_KEY_SERVICE_BLOCKED" -> config(
+                "This API key isn't allowed to call Places API (New). Add it to the " +
+                    "key's API restrictions in the Google Cloud Console.",
             )
 
-            code() == 401 || code() == 403 -> Outcome.Error(
-                message = "That API key was turned away. Check it's enabled for Places API (New).",
-                cause = this,
+            reason == "SERVICE_DISABLED" || reason == "API_NOT_ACTIVATED" ||
+                apiMessage?.contains("has not been used in project", true) == true -> config(
+                "Places API (New) isn't enabled on this project. Enable it in the " +
+                    "Google Cloud Console.",
             )
 
-            code() == 429 -> Outcome.Error("Too many searches too fast. Give it a second.", this)
+            reason == "BILLING_DISABLED" || apiMessage?.contains("billing", true) == true -> config(
+                "Restaurant search needs billing enabled on the Google Cloud project.",
+            )
 
-            code() in 500..599 -> Outcome.Error("Google's having a moment. Try again shortly.", this)
+            reason == "API_KEY_ANDROID_APP_BLOCKED" ||
+                apiMessage?.contains("requests from this android", true) == true -> config(
+                "This key rejects requests from this app. Check its Android restriction " +
+                    "matches the package name and signing SHA-1.",
+            )
 
-            else -> Outcome.Error("Search failed (HTTP ${code()}).", this)
+            reason == "API_KEY_INVALID" || apiMessage?.contains(
+                "API keys are not supported",
+                true,
+            ) == true -> config(
+                "That credential isn't a usable API key. Use the project's AIzaSy… key.",
+            )
+
+            code() == 429 -> Outcome.Error(
+                "Too many searches too fast. Give it a second.", this, ErrorKind.Generic, marker,
+            )
+
+            code() in 500..599 -> Outcome.Error(
+                "Google's having a moment. Try again shortly.", this, ErrorKind.Generic, marker,
+            )
+
+            // Unrecognised: report Google's own words rather than inventing a cause.
+            code() == 401 || code() == 403 -> config(
+                apiMessage ?: "The Places request was denied (HTTP ${code()}).",
+            )
+
+            else -> Outcome.Error(
+                apiMessage ?: "Search failed (HTTP ${code()}).", this, ErrorKind.Generic, marker,
+            )
         }
     }
+
+    /**
+     * Pulls a top-level string value out of an error body without a full parse.
+     *
+     * Deliberately regex rather than kotlinx.serialization: this runs on the failure
+     * path, where the body may be truncated, HTML from a proxy, or not JSON at all,
+     * and a parser throwing there would replace a useful diagnosis with a crash.
+     */
+    private fun String.extractJsonString(key: String): String? =
+        Regex("\"$key\"\\s*:\\s*\"([^\"]*)\"").find(this)?.groupValues?.get(1)?.takeIf {
+            it.isNotBlank()
+        }
 
     /**
      * Snaps the query to a coarse grid so nearby repeat searches share one cache
@@ -150,14 +200,4 @@ class DiscoveryRepositoryImpl @Inject constructor(
         return "$lat:$lng:$radiusBucket"
     }
 
-    private companion object {
-        /** Substrings Google uses when the project has no billing account. */
-        val BILLING_MARKERS = listOf(
-            "billing",
-            "BILLING_DISABLED",
-            "REQUEST_DENIED",
-            "PERMISSION_DENIED",
-            "consumer",
-        )
-    }
 }

@@ -18,18 +18,28 @@ sealed interface Outcome<out T> {
         val message: String,
         val cause: Throwable? = null,
         val kind: ErrorKind = ErrorKind.Generic,
+        /**
+         * The provider's own machine-readable reason (e.g. `API_KEY_SERVICE_BLOCKED`),
+         * carried verbatim so the UI can show what actually came back rather than our
+         * interpretation of it. Never guess this -- leave it null if unknown.
+         */
+        val diagnostic: String? = null,
     ) : Outcome<Nothing>
 }
 
 /**
  * Why a call failed, where the difference changes what we tell the user.
  *
- * [Billing] earns its own case because it is the single most likely failure for
- * this app and looks identical to a dead network if reported generically -- the
- * Places API returns nothing at all until billing is enabled on the key's project,
- * key validity notwithstanding.
+ * [Configuration] covers every "the request never had a chance" case -- billing
+ * off, API not enabled, key restricted away from this service, key blocked for
+ * this app. They share a shape: nothing about the device, network or app is wrong,
+ * retrying cannot help, and the fix is in the Google Cloud Console.
+ *
+ * They are deliberately NOT collapsed into a single message. An earlier version
+ * reported all of them as "enable billing", which sent debugging down the wrong
+ * path for a key whose real problem was its API restriction list.
  */
-enum class ErrorKind { Generic, Network, Billing }
+enum class ErrorKind { Generic, Network, Configuration }
 
 inline fun <T, R> Outcome<T>.map(transform: (T) -> R): Outcome<R> = when (this) {
     is Outcome.Success -> Outcome.Success(transform(data))
