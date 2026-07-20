@@ -1,0 +1,7 @@
+<resources>
+    <!-- Pure-Compose app: this XML theme only needs to hand off to Compose without
+         drawing an ActionBar. All real styling lives in core:ui (see /design HTML). -->
+    <style name="Theme.Nommit" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#FDF3E7</item>
+    </style>
+</resources>

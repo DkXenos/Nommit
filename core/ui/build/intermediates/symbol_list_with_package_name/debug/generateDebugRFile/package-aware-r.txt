@@ -1,0 +1,8 @@
+com.example.nommit.core.ui
+font bagel_fat_one_regular
+font inter_400
+font inter_500
+font inter_700
+font inter_800
+font inter_900
+font permanent_marker_regular

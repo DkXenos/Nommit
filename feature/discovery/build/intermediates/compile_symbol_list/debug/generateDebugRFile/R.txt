@@ -1,0 +1,1 @@
+int raw map_style_zine 0x0

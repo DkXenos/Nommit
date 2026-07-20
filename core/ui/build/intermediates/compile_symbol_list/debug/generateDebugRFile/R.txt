@@ -1,0 +1,7 @@
+int font bagel_fat_one_regular 0x0
+int font inter_400 0x0
+int font inter_500 0x0
+int font inter_700 0x0
+int font inter_800 0x0
+int font inter_900 0x0
+int font permanent_marker_regular 0x0

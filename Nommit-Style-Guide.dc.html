@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Inter:wght@400;500;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0}
+  body{background:#241a12;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:#FF4D2E;text-decoration:none}a:hover{color:#e23c1f}
+  *{box-sizing:border-box}
+  @keyframes sg-chomp{0%{transform:scale(.9) rotate(-8deg)}50%{transform:scale(1.04) rotate(4deg)}100%{transform:scale(1) rotate(-4deg)}}
+  @keyframes sg-float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;padding:52px 24px 90px;background:radial-gradient(130% 90% at 50% 0%,#3a2a1c,#241a12 70%)">
+<div style="max-width:980px;margin:0 auto">
+
+  <!-- ===== COVER ===== -->
+  <div style="position:relative;background:#FF4D2E;border:6px solid #1E1712;border-radius:34px;box-shadow:0 14px 0 #1E1712;padding:44px 40px;overflow:hidden;margin-bottom:44px">
+    <div style="position:absolute;inset:0;background-image:radial-gradient(#1E1712 1.3px,transparent 1.3px);background-size:9px 9px;opacity:.12"></div>
+    <div style="position:relative;display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+      <div style="position:relative;width:104px;height:104px;border-radius:26px;background:#FF4D2E;border:5px solid #1E1712;box-shadow:0 8px 0 #1E1712;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:sg-chomp 2.4s ease-in-out infinite">
+        <span style="font-family:'Bagel Fat One',cursive;font-size:66px;color:#FDF3E7;line-height:1">N</span>
+        <div style="position:absolute;right:-11px;top:18px;width:40px;height:40px;border-radius:50%;background:#e23c1f;border:5px solid #1E1712"></div>
+        <div style="position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:18px solid #1E1712"></div>
+      </div>
+      <div>
+        <div style="font-family:'Bagel Fat One',cursive;font-size:56px;color:#FDF3E7;line-height:.95;text-shadow:0 5px 0 #1E1712">Nommit</div>
+        <div style="display:inline-block;margin-top:12px;background:#FFB627;border:3px solid #1E1712;border-radius:11px;padding:5px 14px;box-shadow:0 4px 0 #1E1712;transform:rotate(-2deg);font-family:'Permanent Marker',cursive;font-size:17px;color:#1E1712">Night-Market Flavor Zine · Design System</div>
+      </div>
+    </div>
+    <p style="position:relative;margin:26px 0 0;max-width:640px;font-size:15px;line-height:1.6;color:#FDF3E7;font-weight:500;text-wrap:pretty">The look &amp; feel of a food-discovery app built like a hand-assembled zine: torn edges, rubber stamps, halftone grain, thick ink outlines, hard offset shadows, and everything tilted a few playful degrees. Loud &amp; overstuffed — but always with a clear reading order.</p>
+  </div>
+
+  <!-- ===== COLORS ===== -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bagel Fat One',cursive;font-size:30px;color:#FDF3E7">01 · Color</span>
+    <span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FFB627">cream + ink is the constant frame</span>
+  </div>
+  <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:26px;box-shadow:0 10px 0 #1E1712;padding:26px;margin-bottom:24px">
+    <div style="font-family:'Permanent Marker',cursive;font-size:16px;color:#FF4D2E;margin-bottom:14px">The frame — always present</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px">
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:3px solid #1E1712;border-radius:16px;padding:12px;box-shadow:0 5px 0 #1E1712">
+        <div style="width:70px;height:70px;border-radius:12px;background:#FDF3E7;border:3px solid #1E1712;flex-shrink:0"></div>
+        <div><div style="font-family:'Bagel Fat One',cursive;font-size:19px;color:#1E1712">Warm Cream</div><div style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FF4D2E">#FDF3E7</div><div style="font-size:12px;color:#6a5c4c;font-weight:600">base paper</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;background:#fff;border:3px solid #1E1712;border-radius:16px;padding:12px;box-shadow:0 5px 0 #1E1712">
+        <div style="width:70px;height:70px;border-radius:12px;background:#1E1712;border:3px solid #1E1712;flex-shrink:0"></div>
+        <div><div style="font-family:'Bagel Fat One',cursive;font-size:19px;color:#1E1712">Ink</div><div style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FF4D2E">#1E1712</div><div style="font-size:12px;color:#6a5c4c;font-weight:600">outlines · shadows · text</div></div>
+      </div>
+    </div>
+    <div style="font-family:'Permanent Marker',cursive;font-size:16px;color:#FF4D2E;margin-bottom:14px">The saturated set — cards &amp; chips</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+      <div style="background:#FF4D2E;border:3px solid #1E1712;border-radius:16px;padding:16px 14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:20px;color:#FDF3E7">Chili</div><div style="font-family:'Permanent Marker',cursive;font-size:15px;color:#1E1712">#FF4D2E</div><div style="font-size:12px;color:#FDF3E7;font-weight:700">primary · Nom action</div></div>
+      <div style="background:#FFB627;border:3px solid #1E1712;border-radius:16px;padding:16px 14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:20px;color:#1E1712">Turmeric</div><div style="font-family:'Permanent Marker',cursive;font-size:15px;color:#e23c1f">#FFB627</div><div style="font-size:12px;color:#1E1712;font-weight:700">secondary · ratings</div></div>
+      <div style="background:#3DD68C;border:3px solid #1E1712;border-radius:16px;padding:16px 14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:20px;color:#1E1712">Pandan</div><div style="font-family:'Permanent Marker',cursive;font-size:15px;color:#e23c1f">#3DD68C</div><div style="font-size:12px;color:#1E1712;font-weight:700">tertiary · confirms</div></div>
+    </div>
+    <div style="font-family:'Permanent Marker',cursive;font-size:16px;color:#FF4D2E;margin-bottom:14px">Pop accents — stickers only, use sparingly</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="background:#FF3E9A;border:3px solid #1E1712;border-radius:16px;padding:14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:18px;color:#FDF3E7">Magenta</div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#1E1712">#FF3E9A</div></div>
+      <div style="background:#00B3C4;border:3px solid #1E1712;border-radius:16px;padding:14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:18px;color:#FDF3E7">Electric Teal</div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#1E1712">#00B3C4</div></div>
+      <div style="background:#7B4BFF;border:3px solid #1E1712;border-radius:16px;padding:14px;box-shadow:0 5px 0 #1E1712"><div style="font-family:'Bagel Fat One',cursive;font-size:18px;color:#FDF3E7">Grape</div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FDF3E7">#7B4BFF</div></div>
+    </div>
+  </div>
+
+  <!-- ===== TYPE ===== -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bagel Fat One',cursive;font-size:30px;color:#FDF3E7">02 · Type</span>
+    <span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FFB627">3 tiers, no more</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;margin-bottom:24px">
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-family:'Inter';font-weight:800;font-size:13px;color:#FF4D2E;letter-spacing:.08em;text-transform:uppercase">Display · headlines &amp; brand</span><span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#6a5c4c">Bagel Fat One</span></div>
+      <div style="font-family:'Bagel Fat One',cursive;font-size:52px;color:#1E1712;line-height:1">Char Kway Teow!</div>
+      <div style="font-size:12.5px;color:#6a5c4c;font-weight:600;margin-top:8px">Bulbous, loud, tight. Restaurant names, big counts, the wordmark. One size fits headlines only — never body.</div>
+    </div>
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><span style="font-family:'Inter';font-weight:800;font-size:13px;color:#FF4D2E;letter-spacing:.08em;text-transform:uppercase">Body / UI · everything readable</span><span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#6a5c4c">Inter</span></div>
+      <div style="font-family:'Inter';font-weight:800;font-size:22px;color:#1E1712">Grilled to order, closes when the coals die.</div>
+      <div style="font-family:'Inter';font-weight:400;font-size:15px;color:#3a2e24;line-height:1.5;margin-top:4px;max-width:620px">Weights 400–900. The clean grotesque keeps the maximalism from ever hurting readability — descriptions, labels, counts, buttons.</div>
+    </div>
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-family:'Inter';font-weight:800;font-size:13px;color:#FF4D2E;letter-spacing:.08em;text-transform:uppercase">Accent · tags &amp; stamps</span><span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#6a5c4c">Permanent Marker</span></div>
+      <div style="font-family:'Permanent Marker',cursive;font-size:34px;color:#1E1712">400 m · nom it! · 1.2 km</div>
+      <div style="font-size:12.5px;color:#6a5c4c;font-weight:600;margin-top:8px">Hand-scrawled captions on price tags, distance stamps, radius tags, section labels. Feels drawn onto the zine.</div>
+    </div>
+  </div>
+
+  <!-- ===== ICONS ===== -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bagel Fat One',cursive;font-size:30px;color:#FDF3E7">03 · Icons &amp; Stickers</span>
+    <span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FFB627">emoji as illustration</span>
+  </div>
+  <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:26px;box-shadow:0 10px 0 #1E1712;padding:26px;margin-bottom:24px">
+    <div style="font-family:'Permanent Marker',cursive;font-size:16px;color:#FF4D2E;margin-bottom:14px">Cuisine set — each pairs with a saturated color</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:9px;background:#FF4D2E;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#1E1712;font-size:14px"><span style="font-size:22px">🍢</span>Satay</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFB627;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#1E1712;font-size:14px"><span style="font-size:22px">🍜</span>Noodles</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#3DD68C;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#1E1712;font-size:14px"><span style="font-size:22px">🥟</span>Dumplings</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#7B4BFF;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#FDF3E7;font-size:14px"><span style="font-size:22px">🌶️</span>Thai</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#00B3C4;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#FDF3E7;font-size:14px"><span style="font-size:22px">🥘</span>Korean</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FF3E9A;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#1E1712;font-size:14px"><span style="font-size:22px">🔥</span>BBQ</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFB627;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#1E1712;font-size:14px"><span style="font-size:22px">🍧</span>Dessert</div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FF4D2E;border:3px solid #1E1712;border-radius:14px;padding:9px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:800;color:#FDF3E7;font-size:14px"><span style="font-size:22px">🍥</span>Ramen</div>
+    </div>
+    <div style="font-family:'Permanent Marker',cursive;font-size:16px;color:#FF4D2E;margin-bottom:14px">Core UI glyphs</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="width:62px;height:62px;border-radius:16px;background:#fff;border:3px solid #1E1712;box-shadow:0 4px 0 #1E1712;display:flex;align-items:center;justify-content:center;font-size:28px">🔍</div><div style="font-size:11px;font-weight:700;color:#1E1712;margin-top:6px">search</div></div>
+      <div style="text-align:center"><div style="width:62px;height:62px;border-radius:16px;background:#fff;border:3px solid #1E1712;box-shadow:0 4px 0 #1E1712;display:flex;align-items:center;justify-content:center;font-size:28px">📍</div><div style="font-size:11px;font-weight:700;color:#1E1712;margin-top:6px">location</div></div>
+      <div style="text-align:center"><div style="width:62px;height:62px;border-radius:16px;background:#fff;border:3px solid #1E1712;box-shadow:0 4px 0 #1E1712;display:flex;align-items:center;justify-content:center;font-size:28px">⭐</div><div style="font-size:11px;font-weight:700;color:#1E1712;margin-top:6px">rating</div></div>
+      <div style="text-align:center"><div style="width:62px;height:62px;border-radius:16px;background:#fff;border:3px solid #1E1712;box-shadow:0 4px 0 #1E1712;display:flex;align-items:center;justify-content:center;font-size:28px">🧭</div><div style="font-size:11px;font-weight:700;color:#1E1712;margin-top:6px">directions</div></div>
+    </div>
+  </div>
+
+  <!-- ===== COMPONENTS ===== -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bagel Fat One',cursive;font-size:30px;color:#FDF3E7">04 · Components</span>
+    <span style="font-family:'Permanent Marker',cursive;font-size:15px;color:#FFB627">outline + hard shadow + a little tilt</span>
+  </div>
+  <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:26px;box-shadow:0 10px 0 #1E1712;padding:28px;margin-bottom:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start">
+      <div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:10px">Primary button</div>
+        <div style="display:flex;align-items:center;gap:9px;background:#FF4D2E;border:4px solid #1E1712;border-radius:18px;padding:13px 26px;box-shadow:0 6px 0 #1E1712;transform:rotate(-1.5deg);font-family:'Bagel Fat One',cursive;font-size:23px;color:#FDF3E7">Nom it <span style="font-size:20px">🔍</span></div></div>
+      <div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:10px">Chips — default / active</div>
+        <div style="display:flex;gap:10px">
+          <div style="display:flex;align-items:center;gap:6px;background:#FDF3E7;border:3px solid #1E1712;border-radius:13px;padding:7px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:700;font-size:14px;color:#1E1712"><span>🍜</span>Noodles <span style="opacity:.5;font-weight:800;font-size:12px">4</span></div>
+          <div style="display:flex;align-items:center;gap:6px;background:#3DD68C;border:3px solid #1E1712;border-radius:13px;padding:7px 12px;box-shadow:0 4px 0 #1E1712;font-family:Inter;font-weight:700;font-size:14px;color:#1E1712;transform:rotate(-2deg)"><span>🥟</span>Dumplings <span style="font-family:'Permanent Marker',cursive">✓</span></div>
+        </div></div>
+      <div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:10px">Sticker · price · stamp</div>
+        <div style="display:flex;gap:9px;align-items:center">
+          <span style="background:#7B4BFF;border:2.5px solid #1E1712;border-radius:9px;padding:3px 11px;font-size:13px;font-weight:700;color:#FDF3E7;transform:rotate(-2deg);box-shadow:0 3px 0 #1E1712">🌶️ Thai</span>
+          <span style="background:#FDF3E7;border:2.5px solid #1E1712;border-radius:9px;padding:3px 11px;font-family:'Permanent Marker',cursive;font-size:15px;color:#1E1712;box-shadow:0 3px 0 #1E1712">$$</span>
+          <span style="display:flex;align-items:center;gap:3px;background:#FFB627;border:2.5px solid #1E1712;border-radius:9px;padding:3px 10px;box-shadow:0 3px 0 #1E1712;transform:rotate(2deg)"><span>⭐</span><span style="font-family:'Bagel Fat One',cursive;font-size:15px;color:#1E1712">4.8</span></span>
+        </div></div>
+      <div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:10px">Map pin</div>
+        <div style="width:44px;height:44px;border-radius:50% 50% 50% 3px;transform:rotate(45deg);background:#FF4D2E;border:3px solid #1E1712;box-shadow:0 3px 0 rgba(30,23,18,.35);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(-45deg);font-size:19px">🍢</span></div></div>
+      <div><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:10px">Radius slider</div>
+        <div style="width:190px;position:relative;height:18px;border:3px solid #1E1712;border-radius:11px;background:#fff"><div style="position:absolute;left:0;top:0;bottom:0;width:52%;background:#FFB627;border-radius:8px 0 0 8px"></div><div style="position:absolute;left:52%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:#FF4D2E;border:3px solid #1E1712;box-shadow:0 3px 0 #1E1712"></div></div></div>
+    </div>
+    <div style="margin-top:28px"><div style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E;margin-bottom:12px">Collage card</div>
+      <div style="max-width:360px;background:#fff;border:3px solid #1E1712;border-radius:16px;box-shadow:0 6px 0 #1E1712;padding:12px;display:flex;gap:13px;transform:rotate(-2deg)">
+        <div style="position:relative;width:92px;height:92px;flex-shrink:0;border:3px solid #1E1712;border-radius:11px;background:#FF4D2E;overflow:hidden;display:flex;align-items:flex-end"><div style="position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(30,23,18,.14) 0 7px,transparent 7px 14px)"></div><div style="position:relative;font-size:8.5px;font-weight:700;color:#1E1712;background:#FDF3E7;border-top:2px solid #1E1712;width:100%;padding:2px 5px">satay skewers</div></div>
+        <div style="flex:1"><div style="font-family:'Bagel Fat One',cursive;font-size:20px;color:#1E1712;line-height:1.05;margin-bottom:7px">Smoky Satay Sultan</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="background:#FF4D2E;border:2px solid #1E1712;border-radius:7px;padding:1px 7px;font-size:11px;font-weight:700;color:#FDF3E7;transform:rotate(-2deg)">🍢 Satay</span><span style="background:#FDF3E7;border:2px solid #1E1712;border-radius:7px;padding:1px 7px;font-family:'Permanent Marker',cursive;font-size:12px">$</span></div><div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span style="display:flex;align-items:center;gap:3px;background:#FFB627;border:2px solid #1E1712;border-radius:8px;padding:1px 8px"><span style="font-size:13px">⭐</span><span style="font-family:'Bagel Fat One',cursive;font-size:14px;color:#1E1712">4.8</span></span><span style="font-family:'Permanent Marker',cursive;font-size:14px;color:#FF4D2E">250 m</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRINCIPLES ===== -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bagel Fat One',cursive;font-size:30px;color:#FDF3E7">05 · Rules of the Zine</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px"><div style="font-family:'Bagel Fat One',cursive;font-size:22px;color:#1E1712;margin-bottom:8px">Outline everything</div><div style="font-size:14px;color:#3a2e24;line-height:1.55">3–6px ink border + a hard offset shadow (<span style="font-family:'Permanent Marker',cursive">0 4–9px 0 #1E1712</span>), no blur. Every card, chip, sticker and button gets the treatment so it reads as a cut-out.</div></div>
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px"><div style="font-family:'Bagel Fat One',cursive;font-size:22px;color:#1E1712;margin-bottom:8px">Tilt ±2–4°</div><div style="font-size:14px;color:#3a2e24;line-height:1.55">Stickers and cards sit at slight rotations for the scrapbook feel. Keep the reading order dead straight — chaos in decoration, order in layout.</div></div>
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px"><div style="font-family:'Bagel Fat One',cursive;font-size:22px;color:#1E1712;margin-bottom:8px">Texture &amp; tearing</div><div style="font-size:14px;color:#3a2e24;line-height:1.55">Halftone dot grain over color fields, torn-paper diagonal hatching on photo placeholders. Warm cream + ink stay the constant frame — max 1–2 background colors.</div></div>
+    <div style="background:#FDF3E7;border:5px solid #1E1712;border-radius:22px;box-shadow:0 8px 0 #1E1712;padding:22px"><div style="font-family:'Bagel Fat One',cursive;font-size:22px;color:#1E1712;margin-bottom:8px">Gummy motion</div><div style="font-size:14px;color:#3a2e24;line-height:1.55">Springy squash-and-overshoot, like it's edible: the launch <b>chomp</b>, chip <b>jiggle</b>, pins <b>bouncing</b> in with steam, a <b>crumb burst</b> on Nom, cards <b>re-dealing</b> on sort.</div></div>
+  </div>
+
+  <div style="text-align:center;margin-top:40px;font-family:'Permanent Marker',cursive;font-size:16px;color:#FFB627">that's the whole zine — now go nom something 🍜</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:900}}"></script>
+</body>
+</html>
