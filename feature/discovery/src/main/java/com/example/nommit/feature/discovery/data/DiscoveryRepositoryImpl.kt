@@ -61,12 +61,24 @@ class DiscoveryRepositoryImpl @Inject constructor(
             }
         }
 
-    private fun List<CachedPlaceEntity>.toOutcome(query: SearchQuery): Outcome<List<Restaurant>> =
-        if (isEmpty()) {
-            Outcome.Empty
-        } else {
-            Outcome.Success(map { it.toRestaurant(query.center) })
-        }
+    /**
+     * Maps to domain and drops anything outside the requested radius.
+     *
+     * The radius filter is not redundant: Text Search only accepts a circle as a
+     * `locationBias`, which is a hint, not a bound -- it will happily return places
+     * beyond the radius when there are few nearby. Without this, the sheet would
+     * claim "12 spots within 1.2 km" while listing places 3 km away and drawing pins
+     * outside the circle on the map.
+     *
+     * Filtering happens on read rather than before caching so the cached page stays
+     * a faithful copy of the response and can still serve a later, wider search.
+     */
+    private fun List<CachedPlaceEntity>.toOutcome(query: SearchQuery): Outcome<List<Restaurant>> {
+        val withinRadius = map { it.toRestaurant(query.center) }
+            .filter { it.distanceMeters <= query.radiusMeters }
+
+        return if (withinRadius.isEmpty()) Outcome.Empty else Outcome.Success(withinRadius)
+    }
 
     /**
      * Walks `nextPageToken` up to the API's three-page ceiling (60 results).

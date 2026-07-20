@@ -39,7 +39,7 @@ class PlacesRemoteDataSource @Inject constructor(
             fieldMask = PlacesFieldMasks.SEARCH,
             request = TextSearchRequest(
                 textQuery = "restaurants",
-                locationRestriction = LocationRestrictionDto(
+                locationBias = LocationBiasDto(
                     circle = CircleDto(
                         center = LatLngDto(query.center.latitude, query.center.longitude),
                         radius = query.radiusMeters,
