@@ -57,9 +57,9 @@ data class TextSearchResponse(
 )
 
 /**
- * Only Essentials-tier fields. Rating, price, opening hours and photos are not
- * modelled because they are not requested -- adding them back here would do
- * nothing without also widening the field mask, which is what actually costs.
+ * Essentials fields plus photos. Rating, price and opening hours are still not
+ * modelled because they are not requested -- adding them here would do nothing
+ * without also widening the field mask, which is what actually costs.
  */
 @Serializable
 data class PlaceDto(
@@ -69,6 +69,15 @@ data class PlaceDto(
     val location: LatLngDto? = null,
     val types: List<String> = emptyList(),
     val primaryType: String? = null,
+    val photos: List<PhotoDto> = emptyList(),
+)
+
+@Serializable
+data class PhotoDto(
+    /** A resource path like `places/ChIJ.../photos/AeJb...`, not a URL. */
+    val name: String,
+    val widthPx: Int? = null,
+    val heightPx: Int? = null,
 )
 
 @Serializable

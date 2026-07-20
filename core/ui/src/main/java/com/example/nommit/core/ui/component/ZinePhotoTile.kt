@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.nommit.core.ui.theme.CuisineStyles
 import com.example.nommit.core.ui.theme.NommitColors
 import com.example.nommit.core.ui.theme.NommitType
@@ -22,12 +24,12 @@ import com.example.nommit.core.ui.theme.Zine
 /**
  * The generated stand-in for a restaurant photo.
  *
- * Places photos sit above the Essentials billing tier, so the app doesn't fetch
- * them at all. Rather than leave a hole, each place gets a drawn zine tile: its
- * cuisine colour, the torn-paper hatching from the style guide, the cuisine emoji
- * as the subject, and a caption strip. Because the colour and emoji come from the
- * cuisine, the tile matches that place's chip and map pin -- it reads as a
- * deliberate illustration rather than a failed image load.
+ * Many street-food places have no Places photo at all, so the drawn tile is the
+ * base layer and a real photo is painted over it when one exists: cuisine colour,
+ * the torn-paper hatching from the style guide, the cuisine emoji as the subject,
+ * and a caption strip. Because the colour and emoji come from the cuisine, the
+ * fallback matches that place's chip and map pin -- it reads as a deliberate
+ * illustration rather than a failed image load.
  */
 @Composable
 fun ZinePhotoTile(
@@ -36,6 +38,12 @@ fun ZinePhotoTile(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 11.dp,
     emojiStyle: androidx.compose.ui.text.TextStyle = NommitType.TitleLarge,
+    /**
+     * A real Places photo, when the place has one. The drawn tile underneath stays
+     * in place as the loading and error state, so a slow or missing image degrades
+     * into the zine illustration rather than a grey rectangle.
+     */
+    photoUrl: String? = null,
 ) {
     val style = CuisineStyles.of(cuisineKey)
 
@@ -57,6 +65,17 @@ fun ZinePhotoTile(
             style = emojiStyle,
             modifier = Modifier.padding(bottom = 12.dp),
         )
+
+        if (photoUrl != null) {
+            // Drawn over the tile rather than replacing it, so there is never a
+            // blank frame between layout and the image arriving.
+            AsyncImage(
+                model = photoUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
 
         Text(
             text = label,

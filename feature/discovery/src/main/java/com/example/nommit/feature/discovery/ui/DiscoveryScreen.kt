@@ -152,6 +152,7 @@ fun DiscoveryScreen(
                             selectedCuisines = state.selectedCuisines,
                             onCuisineToggle = viewModel::onCuisineToggled,
                             onRestaurantClick = { viewModel.onRestaurantSelected(it.id) },
+                            photoUrlFor = { viewModel.photoUrl(it.photoName, maxWidthPx = 400) },
                         )
                     }
                 }
@@ -200,7 +201,10 @@ fun DiscoveryScreen(
                         if (newDetent != SheetDetent.Full) viewModel.onDetailDismissed()
                     },
                 ) {
-                    DetailSheet(restaurant = restaurant)
+                    DetailSheet(
+                        restaurant = restaurant,
+                        photoUrl = viewModel.photoUrl(restaurant.photoName, maxWidthPx = 900),
+                    )
                 }
             }
         }

@@ -32,16 +32,17 @@ import com.example.nommit.core.ui.theme.Zine
 import com.example.nommit.feature.discovery.domain.model.Restaurant
 
 /**
- * The detail sheet: generated zine hero, name, cuisine and distance stickers,
- * address, and the Directions hand-off.
+ * The detail sheet: hero photo, name, cuisine and distance stickers, address, and
+ * the hand-off to Google Maps.
  *
  * The rating badge, price tag and the open-now / nommed-by fact tiles are gone with
- * the paid fields that fed them. Directions is now the sheet's whole purpose, so it
- * gets the space they vacated.
+ * the paid fields that fed them. The Maps hand-off is now the sheet's whole purpose,
+ * so it gets the space they vacated.
  */
 @Composable
 fun DetailSheet(
     restaurant: Restaurant,
+    photoUrl: String?,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -59,6 +60,7 @@ fun DetailSheet(
                 modifier = Modifier.fillMaxWidth().height(210.dp),
                 cornerRadius = Zine.RadiusCard,
                 emojiStyle = NommitType.Counter,
+                photoUrl = photoUrl,
             )
         }
 
@@ -109,7 +111,7 @@ fun DetailSheet(
 
             Spacer(Modifier.height(24.dp))
             ZineButton(
-                onClick = { openDirections(context, restaurant) },
+                onClick = { openInMaps(context, restaurant) },
                 modifier = Modifier.fillMaxWidth(),
                 containerColor = NommitColors.Pandan,
                 contentColor = NommitColors.Ink,
@@ -122,7 +124,7 @@ fun DetailSheet(
             }
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "opens in your maps app",
+                text = "opens the place in Google Maps",
                 style = NommitType.StampSmall,
                 color = NommitColors.InkFaint,
                 modifier = Modifier.fillMaxWidth(),
@@ -133,31 +135,41 @@ fun DetailSheet(
 }
 
 /**
- * Hands off to a maps app rather than rebuilding navigation (build spec §6).
+ * Opens the restaurant's place page in Google Maps.
  *
- * Tries Google Maps' navigation intent first, then falls back to the generic
- * `geo:` URI so the app still works on devices without Google Maps installed.
+ * Deliberately NOT `google.navigation:`, which this used to send: that starts
+ * turn-by-turn guidance the moment it lands, which is far too committal for a
+ * button you might tap just to read the opening hours or look at the street view.
+ * The Maps *search* URL opens the place card instead, and starting directions is
+ * then one obvious tap away inside Maps.
+ *
+ * `query_place_id` is what makes this exact: the place ID resolves to the precise
+ * listing, where a name-and-coordinates query can land on a neighbouring business
+ * or a differently-spelled duplicate.
  */
-private fun openDirections(context: Context, restaurant: Restaurant) {
+private fun openInMaps(context: Context, restaurant: Restaurant) {
     val lat = restaurant.location.latitude
     val lng = restaurant.location.longitude
     val label = Uri.encode(restaurant.name)
 
-    val navigation = Intent(
-        Intent.ACTION_VIEW,
-        Uri.parse("google.navigation:q=$lat,$lng"),
-    ).setPackage("com.google.android.apps.maps")
+    val placeUrl = "https://www.google.com/maps/search/?api=1" +
+        "&query=$label" +
+        "&query_place_id=${Uri.encode(restaurant.id)}"
 
-    val geo = Intent(Intent.ACTION_VIEW, Uri.parse("geo:$lat,$lng?q=$lat,$lng($label)"))
+    // Prefer the Google Maps app; fall back to whatever handles the URL (browser),
+    // then to a generic geo: pin for devices with neither.
+    val inMapsApp = Intent(Intent.ACTION_VIEW, Uri.parse(placeUrl))
+        .setPackage("com.google.android.apps.maps")
+    val anyHandler = Intent(Intent.ACTION_VIEW, Uri.parse(placeUrl))
+    val geoPin = Intent(Intent.ACTION_VIEW, Uri.parse("geo:$lat,$lng?q=$lat,$lng($label)"))
 
-    try {
-        context.startActivity(navigation)
-    } catch (_: ActivityNotFoundException) {
+    for (intent in listOf(inMapsApp, anyHandler, geoPin)) {
         try {
-            context.startActivity(geo)
+            context.startActivity(intent)
+            return
         } catch (_: ActivityNotFoundException) {
-            // No maps app at all -- nothing useful left to do, and crashing over a
-            // secondary action would be worse than quietly doing nothing.
+            // Try the next fallback. Crashing over a secondary action would be
+            // worse than quietly doing nothing.
         }
     }
 }

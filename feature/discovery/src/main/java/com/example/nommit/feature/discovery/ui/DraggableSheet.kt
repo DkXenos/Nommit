@@ -89,10 +89,17 @@ fun DraggableSheet(
             // Drag handle. Only this strip is draggable -- the card list below owns
             // its own vertical scrolling, and stealing that would make the list
             // impossible to scroll at the Full detent.
+            //
+            // Because only this strip responds, it is painted chili rather than left
+            // as bare paper: a grey pill on a cream sheet gave no clue where the
+            // gesture worked, so drags started on the cards and silently did nothing.
+            // The coloured band is the affordance -- it shows the reachable zone, and
+            // the 34dp height clears the ~28dp minimum for a comfortable touch target.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(22.dp)
+                    .height(34.dp)
+                    .background(NommitColors.Chili)
                     .pointerInput(heightPx, detent) {
                         detectVerticalDragGestures(
                             onDragStart = { dragFraction = detent.topFraction },
@@ -113,11 +120,14 @@ fun DraggableSheet(
                     },
                 contentAlignment = Alignment.Center,
             ) {
+                // Cream pill on chili: a double chevron would say "drag" more
+                // explicitly, but the grip pill is the platform convention and the
+                // colour already carries the "this part is interactive" message.
                 Box(
                     modifier = Modifier
-                        .size(width = 52.dp, height = 6.dp)
+                        .size(width = 56.dp, height = 6.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(NommitColors.Ink.copy(alpha = 0.5f)),
+                        .background(NommitColors.Cream),
                 )
             }
 

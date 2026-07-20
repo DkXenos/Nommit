@@ -51,6 +51,7 @@ fun ResultsSheet(
     selectedCuisines: Set<String>,
     onCuisineToggle: (String) -> Unit,
     onRestaurantClick: (Restaurant) -> Unit,
+    photoUrlFor: (Restaurant) -> String?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -104,6 +105,7 @@ fun ResultsSheet(
             itemsIndexed(results, key = { _, item -> item.id }) { index, restaurant ->
                 RestaurantCard(
                     restaurant = restaurant,
+                    photoUrl = photoUrlFor(restaurant),
                     dealInIndex = index,
                     // Tilt by list position, not at random, so a card doesn't jump
                     // to a new angle every time the list re-filters.
@@ -116,15 +118,16 @@ fun ResultsSheet(
 }
 
 /**
- * A result card: generated zine tile, name, cuisine sticker, distance stamp.
+ * A result card: photo, name, cuisine sticker, distance stamp.
  *
- * No rating badge, price tag or photo -- all three needed billed fields. The card
+ * No rating badge or price tag -- those needed fields the app doesn't buy. The card
  * keeps its outline, hard shadow and tilt, so the reduced data reads as a simpler
  * card rather than a broken one.
  */
 @Composable
 fun RestaurantCard(
     restaurant: Restaurant,
+    photoUrl: String?,
     tilt: Float,
     dealInIndex: Int,
     onClick: () -> Unit,
@@ -154,6 +157,7 @@ fun RestaurantCard(
             label = restaurant.cuisine.displayName.lowercase(),
             modifier = Modifier.size(96.dp),
             emojiStyle = NommitType.TitleLarge,
+            photoUrl = photoUrl,
         )
 
         Column(modifier = Modifier.weight(1f)) {

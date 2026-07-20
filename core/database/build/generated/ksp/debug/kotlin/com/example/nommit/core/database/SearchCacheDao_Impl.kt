@@ -39,7 +39,7 @@ public class SearchCacheDao_Impl(
       }
     }
     this.__insertAdapterOfCachedPlaceEntity = object : EntityInsertAdapter<CachedPlaceEntity>() {
-      protected override fun createQuery(): String = "INSERT OR REPLACE INTO `cached_place` (`cacheKey`,`placeId`,`name`,`address`,`latitude`,`longitude`,`types`,`primaryType`,`position`) VALUES (?,?,?,?,?,?,?,?,?)"
+      protected override fun createQuery(): String = "INSERT OR REPLACE INTO `cached_place` (`cacheKey`,`placeId`,`name`,`address`,`latitude`,`longitude`,`types`,`primaryType`,`photoName`,`position`) VALUES (?,?,?,?,?,?,?,?,?,?)"
 
       protected override fun bind(statement: SQLiteStatement, entity: CachedPlaceEntity) {
         statement.bindText(1, entity.cacheKey)
@@ -60,7 +60,13 @@ public class SearchCacheDao_Impl(
         } else {
           statement.bindText(8, _tmpPrimaryType)
         }
-        statement.bindLong(9, entity.position.toLong())
+        val _tmpPhotoName: String? = entity.photoName
+        if (_tmpPhotoName == null) {
+          statement.bindNull(9)
+        } else {
+          statement.bindText(9, _tmpPhotoName)
+        }
+        statement.bindLong(10, entity.position.toLong())
       }
     }
   }
@@ -126,6 +132,7 @@ public class SearchCacheDao_Impl(
         val _columnIndexOfLongitude: Int = getColumnIndexOrThrow(_stmt, "longitude")
         val _columnIndexOfTypes: Int = getColumnIndexOrThrow(_stmt, "types")
         val _columnIndexOfPrimaryType: Int = getColumnIndexOrThrow(_stmt, "primaryType")
+        val _columnIndexOfPhotoName: Int = getColumnIndexOrThrow(_stmt, "photoName")
         val _columnIndexOfPosition: Int = getColumnIndexOrThrow(_stmt, "position")
         val _result: MutableList<CachedPlaceEntity> = mutableListOf()
         while (_stmt.step()) {
@@ -154,9 +161,15 @@ public class SearchCacheDao_Impl(
           } else {
             _tmpPrimaryType = _stmt.getText(_columnIndexOfPrimaryType)
           }
+          val _tmpPhotoName: String?
+          if (_stmt.isNull(_columnIndexOfPhotoName)) {
+            _tmpPhotoName = null
+          } else {
+            _tmpPhotoName = _stmt.getText(_columnIndexOfPhotoName)
+          }
           val _tmpPosition: Int
           _tmpPosition = _stmt.getLong(_columnIndexOfPosition).toInt()
-          _item = CachedPlaceEntity(_tmpCacheKey,_tmpPlaceId,_tmpName,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpTypes,_tmpPrimaryType,_tmpPosition)
+          _item = CachedPlaceEntity(_tmpCacheKey,_tmpPlaceId,_tmpName,_tmpAddress,_tmpLatitude,_tmpLongitude,_tmpTypes,_tmpPrimaryType,_tmpPhotoName,_tmpPosition)
           _result.add(_item)
         }
         _result

@@ -12,7 +12,7 @@ import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
 
 @ScopeMetadata
-@QualifierMetadata
+@QualifierMetadata("com.example.nommit.core.network.PlacesApiKey")
 @DaggerGenerated
 @Generated(
     value = "dagger.internal.codegen.ComponentProcessor",
@@ -36,32 +36,35 @@ public final class DiscoveryViewModel_Factory implements Factory<DiscoveryViewMo
 
   private final Provider<LocationProvider> locationProvider;
 
+  private final Provider<String> placesApiKeyProvider;
+
   private DiscoveryViewModel_Factory(Provider<SearchNearbyRestaurants> searchNearbyProvider,
       Provider<GetAvailableCuisines> getAvailableCuisinesProvider,
       Provider<FilterAndSortRestaurants> filterAndSortProvider,
-      Provider<LocationProvider> locationProvider) {
+      Provider<LocationProvider> locationProvider, Provider<String> placesApiKeyProvider) {
     this.searchNearbyProvider = searchNearbyProvider;
     this.getAvailableCuisinesProvider = getAvailableCuisinesProvider;
     this.filterAndSortProvider = filterAndSortProvider;
     this.locationProvider = locationProvider;
+    this.placesApiKeyProvider = placesApiKeyProvider;
   }
 
   @Override
   public DiscoveryViewModel get() {
-    return newInstance(searchNearbyProvider.get(), getAvailableCuisinesProvider.get(), filterAndSortProvider.get(), locationProvider.get());
+    return newInstance(searchNearbyProvider.get(), getAvailableCuisinesProvider.get(), filterAndSortProvider.get(), locationProvider.get(), placesApiKeyProvider.get());
   }
 
   public static DiscoveryViewModel_Factory create(
       Provider<SearchNearbyRestaurants> searchNearbyProvider,
       Provider<GetAvailableCuisines> getAvailableCuisinesProvider,
       Provider<FilterAndSortRestaurants> filterAndSortProvider,
-      Provider<LocationProvider> locationProvider) {
-    return new DiscoveryViewModel_Factory(searchNearbyProvider, getAvailableCuisinesProvider, filterAndSortProvider, locationProvider);
+      Provider<LocationProvider> locationProvider, Provider<String> placesApiKeyProvider) {
+    return new DiscoveryViewModel_Factory(searchNearbyProvider, getAvailableCuisinesProvider, filterAndSortProvider, locationProvider, placesApiKeyProvider);
   }
 
   public static DiscoveryViewModel newInstance(SearchNearbyRestaurants searchNearby,
       GetAvailableCuisines getAvailableCuisines, FilterAndSortRestaurants filterAndSort,
-      LocationProvider locationProvider) {
-    return new DiscoveryViewModel(searchNearby, getAvailableCuisines, filterAndSort, locationProvider);
+      LocationProvider locationProvider, String placesApiKey) {
+    return new DiscoveryViewModel(searchNearby, getAvailableCuisines, filterAndSort, locationProvider, placesApiKey);
   }
 }

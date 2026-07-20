@@ -6,6 +6,8 @@ import com.example.nommit.core.common.NommitConstants
 import com.example.nommit.core.common.ErrorKind
 import com.example.nommit.core.common.Outcome
 import com.example.nommit.core.location.LocationProvider
+import com.example.nommit.core.network.PlacesApiKey
+import com.example.nommit.feature.discovery.data.remote.placePhotoUrl
 import com.example.nommit.feature.discovery.domain.model.SearchQuery
 import com.example.nommit.feature.discovery.domain.model.SortMode
 import com.example.nommit.feature.discovery.domain.usecase.FilterAndSortRestaurants
@@ -27,6 +29,7 @@ class DiscoveryViewModel @Inject constructor(
     private val getAvailableCuisines: GetAvailableCuisines,
     private val filterAndSort: FilterAndSortRestaurants,
     private val locationProvider: LocationProvider,
+    @param:PlacesApiKey private val placesApiKey: String,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DiscoveryUiState())
@@ -270,6 +273,13 @@ class DiscoveryViewModel @Inject constructor(
     fun onDetailDismissed() {
         _state.update { it.copy(phase = DiscoveryPhase.Results, selectedRestaurantId = null) }
     }
+
+    /**
+     * Photo URLs are built here rather than in the composable so the API key stays
+     * out of the UI layer entirely.
+     */
+    fun photoUrl(photoName: String?, maxWidthPx: Int = 600): String? =
+        photoName?.let { placePhotoUrl(it, placesApiKey, maxWidthPx) }
 
     private companion object {
         const val PROBE_DEBOUNCE_MILLIS = 600L

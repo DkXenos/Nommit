@@ -27,6 +27,9 @@ fun PlaceDto.toCacheEntity(cacheKey: String, position: Int): CachedPlaceEntity? 
         longitude = point.longitude,
         types = types.joinToString(TYPE_SEPARATOR),
         primaryType = primaryType,
+        // Only the first photo: the design shows exactly one image per card and per
+        // detail hero, and each extra reference is billable weight for nothing.
+        photoName = photos.firstOrNull()?.name,
         position = position,
     )
 }
@@ -45,6 +48,7 @@ fun CachedPlaceEntity.toRestaurant(from: LatLng): Restaurant {
         location = LatLng(latitude, longitude),
         cuisine = CuisineResolver.resolve(primaryType, typeList),
         allCuisines = CuisineResolver.allCuisines(primaryType, typeList),
+        photoName = photoName,
         distanceMeters = haversineMeters(from, LatLng(latitude, longitude)),
     )
 }

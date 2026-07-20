@@ -18,10 +18,10 @@ data class Cuisine(
 /**
  * A place, in "basic filtering" mode.
  *
- * Rating, review count, price level, opening hours and photos are absent by
- * design, not by omission: they sit above the Places Essentials billing tier, and
- * this app runs on a project with no billing account. What survives -- name,
- * cuisine and distance -- is exactly what the Essentials field mask returns.
+ * Rating, review count, price level and opening hours are absent by design: they
+ * sit above the billing tier this app is willing to pay for, and nothing renders
+ * them. Photos are the one paid field kept, because a real photo is the single
+ * biggest quality difference on a results card.
  */
 data class Restaurant(
     val id: String,
@@ -31,6 +31,11 @@ data class Restaurant(
     val cuisine: Cuisine,
     /** Every Places type on this place, kept for filtering beyond the primary one. */
     val allCuisines: Set<String>,
+    /**
+     * Places photo resource name, or null when the place has no photo (common for
+     * small street-food places). Null drives the drawn zine-tile fallback.
+     */
+    val photoName: String?,
     /** Straight-line metres from the search centre, computed client-side. */
     val distanceMeters: Double,
 )
