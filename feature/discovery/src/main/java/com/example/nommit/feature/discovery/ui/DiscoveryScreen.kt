@@ -7,6 +7,8 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -101,62 +103,81 @@ fun DiscoveryScreen(
             )
         }
 
-        when (state.phase) {
-            DiscoveryPhase.Splash -> SplashScreen(onFinished = viewModel::onSplashFinished)
+        // Phases cross-fade rather than cutting.
+        //
+        // Keyed on the phase, not the whole state, so a filter change inside Results
+        // doesn't re-trigger the transition and re-deal every card. Detail collapses
+        // onto Results because both draw the same results sheet -- crossfading them
+        // would dissolve the sheet into an identical copy of itself, which flickers
+        // and re-runs the deal-in. The detail sheet has its own transition below.
+        val layer = if (state.phase == DiscoveryPhase.Detail) {
+            DiscoveryPhase.Results
+        } else {
+            state.phase
+        }
 
-            DiscoveryPhase.AwaitingPermission -> PermissionRationale()
+        Crossfade(
+            targetState = layer,
+            animationSpec = tween(durationMillis = 260),
+            label = "phase",
+        ) { phase ->
+            when (phase) {
+                DiscoveryPhase.Splash -> SplashScreen(onFinished = viewModel::onSplashFinished)
 
-            DiscoveryPhase.LocationDenied -> LocationDeniedScreen(
-                onOpenSettings = { context.openAppSettings() },
-                onRetry = viewModel::refreshLocation,
-            )
+                DiscoveryPhase.AwaitingPermission -> PermissionRationale()
 
-            DiscoveryPhase.Search -> SearchLayer(
-                state = state,
-                onRadiusChange = viewModel::onRadiusChanged,
-                onCuisineToggle = viewModel::onCuisineToggled,
-                onNom = viewModel::onNomClicked,
-            )
+                DiscoveryPhase.LocationDenied -> LocationDeniedScreen(
+                    onOpenSettings = { context.openAppSettings() },
+                    onRetry = viewModel::refreshLocation,
+                )
 
-            DiscoveryPhase.Nomming -> NommingCounter(target = state.allResults.size)
+                DiscoveryPhase.Search -> SearchLayer(
+                    state = state,
+                    onRadiusChange = viewModel::onRadiusChanged,
+                    onCuisineToggle = viewModel::onCuisineToggled,
+                    onNom = viewModel::onNomClicked,
+                )
 
-            DiscoveryPhase.Results, DiscoveryPhase.Detail -> {
-                DraggableSheet(
-                    detent = sheetDetent,
-                    onDetentChange = { sheetDetent = it },
-                ) {
-                    ResultsSheet(
-                        results = state.visibleResults,
-                        radiusMeters = state.radiusMeters,
-                        cuisines = state.availableCuisines,
-                        selectedCuisines = state.selectedCuisines,
-                        onCuisineToggle = viewModel::onCuisineToggled,
-                        onRestaurantClick = { viewModel.onRestaurantSelected(it.id) },
+                DiscoveryPhase.Nomming -> NommingCounter(target = state.allResults.size)
+
+                DiscoveryPhase.Results, DiscoveryPhase.Detail -> {
+                    DraggableSheet(
+                        detent = sheetDetent,
+                        onDetentChange = { sheetDetent = it },
+                    ) {
+                        ResultsSheet(
+                            results = state.visibleResults,
+                            radiusMeters = state.radiusMeters,
+                            cuisines = state.availableCuisines,
+                            selectedCuisines = state.selectedCuisines,
+                            onCuisineToggle = viewModel::onCuisineToggled,
+                            onRestaurantClick = { viewModel.onRestaurantSelected(it.id) },
+                        )
+                    }
+                }
+
+                DiscoveryPhase.Empty -> BottomPanel {
+                    EmptyState(
+                        onWidenRadius = viewModel::onWidenRadius,
+                        onBackToMap = viewModel::onBackToMap,
                     )
                 }
-            }
 
-            DiscoveryPhase.Empty -> BottomPanel {
-                EmptyState(
-                    onWidenRadius = viewModel::onWidenRadius,
-                    onBackToMap = viewModel::onBackToMap,
-                )
-            }
+                DiscoveryPhase.SetupRequired -> BottomPanel {
+                    SetupRequiredState(
+                        message = state.errorMessage ?: "Places isn't configured for this key.",
+                        diagnostic = state.errorDiagnostic,
+                        onBackToMap = viewModel::onBackToMap,
+                    )
+                }
 
-            DiscoveryPhase.SetupRequired -> BottomPanel {
-                SetupRequiredState(
-                    message = state.errorMessage ?: "Places isn't configured for this key.",
-                    diagnostic = state.errorDiagnostic,
-                    onBackToMap = viewModel::onBackToMap,
-                )
-            }
-
-            DiscoveryPhase.Error -> BottomPanel {
-                ErrorState(
-                    message = state.errorMessage ?: "Something went wrong.",
-                    onRetry = viewModel::onRetry,
-                    onBackToMap = viewModel::onBackToMap,
-                )
+                DiscoveryPhase.Error -> BottomPanel {
+                    ErrorState(
+                        message = state.errorMessage ?: "Something went wrong.",
+                        onRetry = viewModel::onRetry,
+                        onBackToMap = viewModel::onBackToMap,
+                    )
+                }
             }
         }
 

@@ -34,6 +34,7 @@ import com.example.nommit.core.common.formatDistance
 import com.example.nommit.core.ui.component.ZineButton
 import com.example.nommit.core.ui.component.ZineCuisineChip
 import com.example.nommit.core.ui.component.ZinePanel
+import com.example.nommit.core.ui.component.rememberPulse
 import com.example.nommit.core.ui.component.zineSurface
 import com.example.nommit.core.ui.theme.CuisineStyles
 import com.example.nommit.core.ui.theme.NommitColors
@@ -111,8 +112,13 @@ fun SearchControls(
 /** The tilted chili stamp showing the current radius. */
 @Composable
 private fun RadiusStamp(radiusMeters: Double) {
+    // Pulse per 100 m crossed, matching the slider's haptic tick -- keying on the
+    // raw value would shake the stamp on every frame of a drag.
+    val pulse = rememberPulse(pulseKey = (radiusMeters / 100).toInt())
+
     Box(
         modifier = Modifier
+            .then(pulse)
             .rotate(-Zine.TILT_SUBTLE)
             .zineSurface(
                 background = NommitColors.Chili,

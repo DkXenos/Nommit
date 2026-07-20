@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.nommit.core.common.formatDistance
 import com.example.nommit.core.ui.component.ZineCuisineChip
+import com.example.nommit.core.ui.component.rememberDealIn
 import com.example.nommit.core.ui.component.ZinePhotoTile
 import com.example.nommit.core.ui.component.ZineSticker
 import com.example.nommit.core.ui.component.zineSurface
@@ -103,6 +104,7 @@ fun ResultsSheet(
             itemsIndexed(results, key = { _, item -> item.id }) { index, restaurant ->
                 RestaurantCard(
                     restaurant = restaurant,
+                    dealInIndex = index,
                     // Tilt by list position, not at random, so a card doesn't jump
                     // to a new angle every time the list re-filters.
                     tilt = Zine.CardTilts[index % Zine.CardTilts.size],
@@ -124,15 +126,19 @@ fun ResultsSheet(
 fun RestaurantCard(
     restaurant: Restaurant,
     tilt: Float,
+    dealInIndex: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cuisineStyle = CuisineStyles.of(restaurant.cuisine.key)
+    // The deal-in owns the rotation so the card lands on its tilt rather than
+    // holding it while separately fading in.
+    val dealIn = rememberDealIn(index = dealInIndex, settleRotation = tilt)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .rotate(tilt)
+            .then(dealIn)
             .zineSurface(
                 background = NommitColors.CardWhite,
                 cornerRadius = Zine.RadiusCard,

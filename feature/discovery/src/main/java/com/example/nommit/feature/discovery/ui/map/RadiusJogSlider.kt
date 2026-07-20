@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -116,7 +118,11 @@ fun RadiusJogSlider(
         modifier = modifier.fillMaxWidth().height(34.dp),
         contentAlignment = Alignment.Center,
     ) {
-        val halfTrackPx = with(density) { maxWidth.toPx() } / 2f
+        // How far the thumb's *centre* may travel from the track's centre. Stopping
+        // a thumb-radius short of the edge keeps the whole 30dp thumb, border and
+        // shadow inside the track instead of hanging off the end at full deflection.
+        val travelPx = (with(density) { maxWidth.toPx() } / 2f) -
+            with(density) { THUMB_RADIUS.toPx() }
 
         Box(
             modifier = Modifier
@@ -128,7 +134,10 @@ fun RadiusJogSlider(
                     borderWidth = Zine.BorderNormal,
                     shadowOffset = 0.dp,
                 )
-                .pointerInput(halfTrackPx) {
+                // The fill is a child, so it has to be clipped to the track's rounded
+                // rect or it squares off the corners at full deflection.
+                .clip(RoundedCornerShape(11.dp))
+                .pointerInput(travelPx) {
                     detectDragGestures(
                         onDragStart = {
                             isDragging = true
@@ -137,8 +146,11 @@ fun RadiusJogSlider(
                         onDrag = { change, dragAmount ->
                             change.consume()
                             scope.launch {
+                                // Divided by the same travel the thumb uses, so the
+                                // thumb stays exactly under the finger in both
+                                // directions.
                                 offsetFraction.snapTo(
-                                    (offsetFraction.value + dragAmount.x / halfTrackPx)
+                                    (offsetFraction.value + dragAmount.x / travelPx)
                                         .coerceIn(-1f, 1f),
                                 )
                             }
@@ -175,19 +187,20 @@ fun RadiusJogSlider(
                     .background(NommitColors.Ink.copy(alpha = 0.3f)),
             )
 
-            // Turmeric fill growing out from centre in the direction of travel --
-            // the comp's way of showing which way the radius is moving.
+            // Turmeric fill spanning centre -> thumb, in the direction of travel.
+            //
+            // This Box is centre-aligned, so a fill of width w sits at
+            // [centre - w/2, centre + w/2] before any offset. To make it run from the
+            // centre out to the thumb it must shift by exactly half its own width in
+            // the direction of travel -- hence `f * travel / 2`, which is symmetric.
+            // (Offsetting by 0 or by -w, as this once did, leaves the bar straddling
+            // the centre on the right and running off the end on the left.)
+            val fillWidthPx = abs(offsetFraction.value) * travelPx
             Box(
                 modifier = Modifier
-                    .offset(
-                        x = with(density) {
-                            (minOf(offsetFraction.value, 0f) * halfTrackPx).toDp()
-                        },
-                    )
+                    .offset(x = with(density) { (offsetFraction.value * travelPx / 2f).toDp() })
                     .size(
-                        width = with(density) {
-                            (abs(offsetFraction.value) * halfTrackPx).toDp()
-                        },
+                        width = with(density) { fillWidthPx.toDp() },
                         height = 18.dp,
                     )
                     .background(NommitColors.Turmeric),
@@ -196,17 +209,20 @@ fun RadiusJogSlider(
 
         Box(
             modifier = Modifier
-                .offset(x = with(density) { (offsetFraction.value * halfTrackPx).toDp() })
-                .size(30.dp)
+                .offset(x = with(density) { (offsetFraction.value * travelPx).toDp() })
+                .size(THUMB_RADIUS * 2)
                 .zineSurface(
                     background = NommitColors.Chili,
-                    cornerRadius = 15.dp,
+                    cornerRadius = THUMB_RADIUS,
                     borderWidth = Zine.BorderNormal,
                     shadowOffset = Zine.ShadowTiny,
                 ),
         )
     }
 }
+
+/** Half the thumb, used to keep its travel inside the track. */
+private val THUMB_RADIUS = 15.dp
 
 /** Ignore the first sliver of travel so a resting thumb never creeps. */
 private const val DEAD_ZONE = 0.04f

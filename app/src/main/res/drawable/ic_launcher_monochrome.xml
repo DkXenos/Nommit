@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Themed-icon (monochrome) layer: the glyph alone.
+
+  It cannot reuse the foreground, because the system flattens this layer to a
+  single tint — the bite circle would tint to the same colour as the N and simply
+  disappear, leaving a smudged letterform.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M39.15 79.86Q35.60 79.86 33.75 77.66Q31.91 75.45 31.91 71.76V38.44Q31.91 34.75 33.29 32.44Q34.68 30.13 36.92 29.07Q39.15 28.00 41.78 28.00Q45.69 28.00 48.39 30.06Q51.09 32.12 52.58 37.31L60.25 63.52H61.39V36.24Q61.39 32.48 63.31 30.31Q65.22 28.14 68.78 28.14Q72.47 28.14 74.28 30.31Q76.09 32.48 76.09 36.24V68.35Q76.09 74.32 73.46 77.16Q70.84 80.00 66.08 80.00Q61.25 80.00 58.55 77.44Q55.85 74.89 54.43 69.91L49.38 52.65Q49.24 51.94 48.85 51.34Q48.46 50.73 47.82 50.73Q47.04 50.73 46.75 51.34Q46.47 51.94 46.47 52.65V71.76Q46.47 75.45 44.62 77.66Q42.78 79.86 39.15 79.86Z" />
+</vector>
