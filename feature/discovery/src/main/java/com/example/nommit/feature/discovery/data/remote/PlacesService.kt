@@ -26,14 +26,3 @@ interface PlacesService {
         @Body request: TextSearchRequest,
     ): TextSearchResponse
 }
-
-/**
- * Builds a Places photo URL. The key is appended here, at request time, and never
- * stored -- which is why the cache holds photo *names* instead of URLs.
- *
- * @param maxWidthPx capped at the card's rendered width; asking for more costs the
- *   same but wastes bandwidth on a 96dp thumbnail.
- */
-fun placePhotoUrl(photoName: String, apiKey: String, maxWidthPx: Int = 600): String =
-    "https://places.googleapis.com/v1/$photoName/media" +
-        "?maxWidthPx=$maxWidthPx&key=$apiKey"

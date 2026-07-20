@@ -3,7 +3,6 @@ package com.example.nommit.feature.discovery.ui
 import com.example.nommit.core.common.LatLng
 import com.example.nommit.core.common.NommitConstants
 import com.example.nommit.feature.discovery.domain.model.Cuisine
-import com.example.nommit.feature.discovery.domain.model.PriceLevel
 import com.example.nommit.feature.discovery.domain.model.Restaurant
 import com.example.nommit.feature.discovery.domain.model.SortMode
 
@@ -39,10 +38,17 @@ enum class DiscoveryPhase {
 
     /** Network or API failure, with a retry. */
     Error,
+
+    /**
+     * The key is fine but its Google Cloud project has no billing account, so
+     * Places returns nothing at all. Distinct from [Error] because the fix is a
+     * console setting, not a retry.
+     */
+    BillingRequired,
 }
 
 /**
- * One state object for the whole feature. Results, sort, filter and detail all
+ * One state object for the whole feature. Results, filters and detail all
  * hang off the same search, so splitting them into separate states would only
  * create ways for them to disagree (build spec §3).
  */
@@ -59,11 +65,10 @@ data class DiscoveryUiState(
     /** Everything the search returned, before filters. */
     val allResults: List<Restaurant> = emptyList(),
 
-    /** [allResults] after cuisine + price filtering and sorting -- what the UI draws. */
+    /** [allResults] after cuisine filtering and distance sorting -- what the UI draws. */
     val visibleResults: List<Restaurant> = emptyList(),
 
     val sortMode: SortMode = SortMode.Nearest,
-    val priceFilter: PriceLevel? = null,
 
     val selectedRestaurantId: String? = null,
 
@@ -95,6 +100,7 @@ data class DiscoveryUiState(
             DiscoveryPhase.Detail,
             DiscoveryPhase.Empty,
             DiscoveryPhase.Error,
+            DiscoveryPhase.BillingRequired,
         )
 
     /** Pins only make sense once there is a result set behind them. */

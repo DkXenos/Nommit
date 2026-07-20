@@ -32,13 +32,13 @@ public class NommitDatabase_Impl : NommitDatabase() {
   }
 
   protected override fun createOpenDelegate(): RoomOpenDelegate {
-    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(1, "2db59ef6cf7680d8683ab1bb953a83ff", "3889941b4c9046ac15c0c7bfc6269e49") {
+    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(2, "5219e0d26c72988540f94a347e1f45fa", "fdb0cb8bb5f0352d299c2bf66b4d1678") {
       public override fun createAllTables(connection: SQLiteConnection) {
         connection.execSQL("CREATE TABLE IF NOT EXISTS `cached_search` (`cacheKey` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))")
-        connection.execSQL("CREATE TABLE IF NOT EXISTS `cached_place` (`cacheKey` TEXT NOT NULL, `placeId` TEXT NOT NULL, `name` TEXT NOT NULL, `address` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `types` TEXT NOT NULL, `primaryType` TEXT, `primaryTypeDisplayName` TEXT, `priceLevel` TEXT, `rating` REAL, `userRatingCount` INTEGER, `openNow` INTEGER, `photoName` TEXT, `position` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`, `placeId`), FOREIGN KEY(`cacheKey`) REFERENCES `cached_search`(`cacheKey`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `cached_place` (`cacheKey` TEXT NOT NULL, `placeId` TEXT NOT NULL, `name` TEXT NOT NULL, `address` TEXT, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `types` TEXT NOT NULL, `primaryType` TEXT, `position` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`, `placeId`), FOREIGN KEY(`cacheKey`) REFERENCES `cached_search`(`cacheKey`) ON UPDATE NO ACTION ON DELETE CASCADE )")
         connection.execSQL("CREATE INDEX IF NOT EXISTS `index_cached_place_cacheKey` ON `cached_place` (`cacheKey`)")
         connection.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2db59ef6cf7680d8683ab1bb953a83ff')")
+        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5219e0d26c72988540f94a347e1f45fa')")
       }
 
       public override fun dropAllTables(connection: SQLiteConnection) {
@@ -87,12 +87,6 @@ public class NommitDatabase_Impl : NommitDatabase() {
         _columnsCachedPlace.put("longitude", TableInfo.Column("longitude", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
         _columnsCachedPlace.put("types", TableInfo.Column("types", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
         _columnsCachedPlace.put("primaryType", TableInfo.Column("primaryType", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("primaryTypeDisplayName", TableInfo.Column("primaryTypeDisplayName", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("priceLevel", TableInfo.Column("priceLevel", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("rating", TableInfo.Column("rating", "REAL", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("userRatingCount", TableInfo.Column("userRatingCount", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("openNow", TableInfo.Column("openNow", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
-        _columnsCachedPlace.put("photoName", TableInfo.Column("photoName", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
         _columnsCachedPlace.put("position", TableInfo.Column("position", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
         val _foreignKeysCachedPlace: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
         _foreignKeysCachedPlace.add(TableInfo.ForeignKey("cached_search", "CASCADE", "NO ACTION", listOf("cacheKey"), listOf("cacheKey")))

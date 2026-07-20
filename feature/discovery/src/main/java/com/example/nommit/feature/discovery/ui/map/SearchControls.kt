@@ -76,7 +76,7 @@ fun SearchControls(
                     RadiusStamp(radiusMeters)
                 }
                 Spacer(Modifier.height(9.dp))
-                RadiusSlider(radiusMeters = radiusMeters, onRadiusChange = onRadiusChange)
+                RadiusJogSlider(radiusMeters = radiusMeters, onRadiusChange = onRadiusChange)
             }
 
             Column {
@@ -126,97 +126,6 @@ private fun RadiusStamp(radiusMeters: Double) {
             text = formatDistance(radiusMeters),
             style = NommitType.CardTitle,
             color = NommitColors.Cream,
-        )
-    }
-}
-
-/**
- * The radius control.
- *
- * The comp's map has a draggable handle on the circle's edge, but that handle sits
- * under the results sheet and fights the map's own pan gesture. The build spec
- * allows the styled-slider fallback for exactly this reason, so the slider is the
- * control and the circle just reflects it -- one thumb zone, no conflict.
- *
- * Built by hand rather than with M3 Slider because the track, fill and thumb all
- * need the ink outline and hard shadow, which Slider's theming can't express.
- */
-@Composable
-private fun RadiusSlider(
-    radiusMeters: Double,
-    onRadiusChange: (Double) -> Unit,
-) {
-    val min = NommitConstants.MIN_RADIUS_METERS
-    val max = NommitConstants.MAX_RADIUS_METERS
-    val fraction = ((radiusMeters - min) / (max - min)).toFloat().coerceIn(0f, 1f)
-
-    val density = LocalDensity.current
-    val currentOnChange by rememberUpdatedState(onRadiusChange)
-
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        val trackWidthPx = with(density) { maxWidth.toPx() }
-        // Drag position is tracked in pixels so a drag stays smooth regardless of
-        // how the radius value is later clamped or rounded.
-        var dragX by remember(trackWidthPx) { mutableFloatStateOf(fraction * trackWidthPx) }
-
-        fun emit(x: Float) {
-            val clamped = x.coerceIn(0f, trackWidthPx)
-            dragX = clamped
-            currentOnChange(min + (clamped / trackWidthPx) * (max - min))
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(18.dp)
-                .zineSurface(
-                    background = NommitColors.CardWhite,
-                    cornerRadius = 11.dp,
-                    borderWidth = Zine.BorderNormal,
-                    shadowOffset = 0.dp,
-                )
-                .pointerInput(trackWidthPx) {
-                    detectHorizontalDragGestures(
-                        onDragStart = { offset -> emit(offset.x) },
-                        onHorizontalDrag = { change, delta ->
-                            change.consume()
-                            emit(dragX + delta)
-                        },
-                    )
-                },
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(fraction)
-                    .height(18.dp)
-                    .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
-                    .zineSurface(
-                        background = NommitColors.Turmeric,
-                        cornerRadius = 8.dp,
-                        borderWidth = 0.dp,
-                        borderColor = NommitColors.Turmeric,
-                        shadowOffset = 0.dp,
-                    ),
-            )
-        }
-
-        // The thumb is drawn outside the track so its 30dp circle and hard shadow
-        // aren't clipped by the 18dp track height.
-        Box(
-            modifier = Modifier
-                .offset(x = with(density) { (fraction * trackWidthPx).toDp() } - 15.dp)
-                .size(30.dp)
-                .zineSurface(
-                    background = NommitColors.Chili,
-                    cornerRadius = 15.dp,
-                    borderWidth = Zine.BorderNormal,
-                    shadowOffset = Zine.ShadowTiny,
-                ),
         )
     }
 }

@@ -38,23 +38,6 @@ import com.example.nommit.core.ui.theme.Zine
  */
 
 /**
- * Gummy press feedback (style guide §05 "Gummy motion"): the element squashes
- * toward its shadow rather than fading. Returns a scale to feed a graphicsLayer.
- */
-@Composable
-private fun pressScale(pressed: Boolean, squash: Float = 0.96f): Float {
-    val scale by animateFloatAsState(
-        targetValue = if (pressed) squash else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium,
-        ),
-        label = "pressScale",
-    )
-    return scale
-}
-
-/**
  * The primary action button -- "Nom it 🔍". Chili fill, 4px ink outline, 6px hard
  * shadow, Bagel Fat One label.
  *
@@ -191,8 +174,8 @@ fun ZineCuisineChip(
 }
 
 /**
- * A sticker: the small tilted tag used for cuisine labels, price marks and the
- * rating badge. Leaf element only -- never wrap running text in one.
+ * A sticker: the small tilted tag used for cuisine labels and distance stamps.
+ * Leaf element only -- never wrap running text in one.
  */
 @Composable
 fun ZineSticker(
@@ -224,33 +207,6 @@ fun ZineSticker(
         CompositionLocalProvider(
             LocalTextStyle provides textStyle.copy(color = contentColor),
             content = { content() },
-        )
-    }
-}
-
-/** The turmeric star badge that appears on every card and the detail hero. */
-@Composable
-fun ZineRatingBadge(
-    rating: Double,
-    modifier: Modifier = Modifier,
-    tilt: Float = 1.5f,
-    large: Boolean = false,
-) {
-    ZineSticker(
-        modifier = modifier,
-        background = NommitColors.Turmeric,
-        tilt = tilt,
-        cornerRadius = if (large) Zine.RadiusControl else Zine.RadiusTag,
-        borderWidth = if (large) Zine.BorderNormal else Zine.BorderHairline,
-        shadowOffset = Zine.ShadowTiny,
-        horizontalPadding = if (large) 11.dp else 8.dp,
-        verticalPadding = if (large) 3.dp else 1.dp,
-    ) {
-        Text("⭐", style = if (large) NommitType.Stamp else NommitType.StickerLabel)
-        Text(
-            text = String.format(java.util.Locale.US, "%.1f", rating),
-            style = if (large) NommitType.CardTitle else NommitType.RatingNumber,
-            color = NommitColors.Ink,
         )
     }
 }

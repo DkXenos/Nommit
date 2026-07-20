@@ -1,6 +1,5 @@
 package com.example.nommit.feature.discovery.data.remote
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -27,7 +26,6 @@ data class TextSearchRequest(
      * pages with places at the far edge of a large radius.
      */
     val rankPreference: String = "DISTANCE",
-    val openNow: Boolean? = null,
 )
 
 @Serializable
@@ -45,6 +43,11 @@ data class TextSearchResponse(
     val nextPageToken: String? = null,
 )
 
+/**
+ * Only Essentials-tier fields. Rating, price, opening hours and photos are not
+ * modelled because they are not requested -- adding them back here would do
+ * nothing without also widening the field mask, which is what actually costs.
+ */
 @Serializable
 data class PlaceDto(
     val id: String,
@@ -53,29 +56,10 @@ data class PlaceDto(
     val location: LatLngDto? = null,
     val types: List<String> = emptyList(),
     val primaryType: String? = null,
-    val primaryTypeDisplayName: LocalizedTextDto? = null,
-    val priceLevel: String? = null,
-    val rating: Double? = null,
-    val userRatingCount: Int? = null,
-    val currentOpeningHours: OpeningHoursDto? = null,
-    val photos: List<PhotoDto> = emptyList(),
 )
 
 @Serializable
 data class LocalizedTextDto(
     val text: String? = null,
     val languageCode: String? = null,
-)
-
-@Serializable
-data class OpeningHoursDto(
-    @SerialName("openNow") val openNow: Boolean? = null,
-)
-
-@Serializable
-data class PhotoDto(
-    /** A resource path like `places/ChIJ.../photos/AeJb...`, not a URL. */
-    val name: String,
-    val widthPx: Int? = null,
-    val heightPx: Int? = null,
 )

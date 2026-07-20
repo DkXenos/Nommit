@@ -291,6 +291,74 @@ fun ErrorState(
     }
 }
 
+/**
+ * The key is valid but its project has no billing account.
+ *
+ * This gets its own state rather than folding into [ErrorState] because the cause
+ * and the cure are completely different: nothing about the device, network or app
+ * is wrong, and no amount of retrying will help. Places API (New) and the Maps SDK
+ * both return zero data until billing is attached -- a valid key alone is not
+ * enough, which is the single most confusing thing about setting this app up.
+ */
+@Composable
+fun BillingRequiredState(
+    onBackToMap: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 26.dp, end = 26.dp, top = 30.dp, bottom = 34.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .floating()
+                .size(100.dp)
+                .zineSurface(
+                    background = NommitColors.CardWhite,
+                    cornerRadius = 50.dp,
+                    borderWidth = Zine.BorderThick,
+                    shadowOffset = Zine.ShadowMedium,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("🧾", style = NommitType.TitleLarge)
+        }
+        Spacer(Modifier.height(14.dp))
+        Text(
+            text = "Billing's not switched on",
+            style = NommitType.TitleLarge,
+            color = NommitColors.Ink,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "Restaurant search needs billing enabled on the Google Cloud project.",
+            style = NommitType.Body,
+            color = NommitColors.InkMuted,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 280.dp),
+        )
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = "Console → Billing → link a billing account to the key's project. " +
+                "There's a monthly free allotment, so this stays free at this scale.",
+            style = NommitType.StampSmall,
+            color = NommitColors.InkFaint,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.widthIn(max = 280.dp),
+        )
+        Spacer(Modifier.height(20.dp))
+        Text(
+            text = "← back to map",
+            style = NommitType.SectionLabel,
+            color = NommitColors.Chili,
+            modifier = Modifier.clickable(onClick = onBackToMap),
+        )
+    }
+}
+
 /** Shared full-screen layout for the permission and denied states. */
 @Composable
 private fun CenteredMessage(

@@ -5,7 +5,6 @@ import com.example.nommit.core.common.haversineMeters
 import com.example.nommit.core.database.CachedPlaceEntity
 import com.example.nommit.feature.discovery.data.remote.PlaceDto
 import com.example.nommit.feature.discovery.domain.CuisineResolver
-import com.example.nommit.feature.discovery.domain.model.PriceLevel
 import com.example.nommit.feature.discovery.domain.model.Restaurant
 
 private const val TYPE_SEPARATOR = ","
@@ -28,14 +27,6 @@ fun PlaceDto.toCacheEntity(cacheKey: String, position: Int): CachedPlaceEntity? 
         longitude = point.longitude,
         types = types.joinToString(TYPE_SEPARATOR),
         primaryType = primaryType,
-        primaryTypeDisplayName = primaryTypeDisplayName?.text,
-        priceLevel = priceLevel,
-        rating = rating,
-        userRatingCount = userRatingCount,
-        openNow = currentOpeningHours?.openNow,
-        // Only the first photo is kept: the design shows exactly one image per
-        // card and per detail hero, and each extra photo reference is billable.
-        photoName = photos.firstOrNull()?.name,
         position = position,
     )
 }
@@ -52,13 +43,8 @@ fun CachedPlaceEntity.toRestaurant(from: LatLng): Restaurant {
         name = name,
         address = address,
         location = LatLng(latitude, longitude),
-        cuisine = CuisineResolver.resolve(primaryType, primaryTypeDisplayName, typeList),
+        cuisine = CuisineResolver.resolve(primaryType, typeList),
         allCuisines = CuisineResolver.allCuisines(primaryType, typeList),
-        priceLevel = PriceLevel.fromApi(priceLevel),
-        rating = rating,
-        userRatingCount = userRatingCount,
-        openNow = openNow,
-        photoName = photoName,
         distanceMeters = haversineMeters(from, LatLng(latitude, longitude)),
     )
 }

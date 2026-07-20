@@ -1,18 +1,14 @@
 package com.example.nommit.feature.discovery.data
 
 import com.example.nommit.core.common.DispatcherProvider
+import com.example.nommit.core.common.ErrorKind
 import com.example.nommit.core.common.NommitConstants
 import com.example.nommit.core.common.Outcome
 import com.example.nommit.core.database.CachedPlaceEntity
 import com.example.nommit.core.database.SearchCacheDao
-import com.example.nommit.core.network.PlacesFieldMasks
 import com.example.nommit.feature.discovery.data.mapper.toCacheEntity
 import com.example.nommit.feature.discovery.data.mapper.toRestaurant
-import com.example.nommit.feature.discovery.data.remote.CircleDto
-import com.example.nommit.feature.discovery.data.remote.LatLngDto
-import com.example.nommit.feature.discovery.data.remote.LocationRestrictionDto
-import com.example.nommit.feature.discovery.data.remote.PlacesService
-import com.example.nommit.feature.discovery.data.remote.TextSearchRequest
+import com.example.nommit.feature.discovery.data.remote.RestaurantRemoteDataSource
 import com.example.nommit.feature.discovery.domain.DiscoveryRepository
 import com.example.nommit.feature.discovery.domain.model.Restaurant
 import com.example.nommit.feature.discovery.domain.model.SearchQuery
@@ -25,7 +21,7 @@ import kotlin.math.roundToInt
 
 @Singleton
 class DiscoveryRepositoryImpl @Inject constructor(
-    private val service: PlacesService,
+    private val remote: RestaurantRemoteDataSource,
     private val cacheDao: SearchCacheDao,
     private val dispatchers: DispatcherProvider,
 ) : DiscoveryRepository {
@@ -48,16 +44,20 @@ class DiscoveryRepositoryImpl @Inject constructor(
             try {
                 val places = fetchAllPages(query, key)
                 // Best-effort persistence: a cache write failure must not fail a
-                // search the user has already successfully paid for.
+                // search that already succeeded.
                 runCatching {
                     cacheDao.cache(key, timestamp, places)
                     cacheDao.deleteExpired(timestamp - NommitConstants.CACHE_TTL_MILLIS)
                 }
                 places.toOutcome(query)
             } catch (e: IOException) {
-                Outcome.Error("Couldn't reach the kitchen. Check your connection.", e)
+                Outcome.Error(
+                    message = "Couldn't reach the kitchen. Check your connection.",
+                    cause = e,
+                    kind = ErrorKind.Network,
+                )
             } catch (e: HttpException) {
-                Outcome.Error(httpMessage(e.code()), e)
+                e.toOutcome()
             }
         }
 
@@ -83,30 +83,17 @@ class DiscoveryRepositoryImpl @Inject constructor(
         var pageToken: String? = null
 
         repeat(NommitConstants.MAX_PAGES) {
-            val response = service.searchText(
-                fieldMask = PlacesFieldMasks.SEARCH,
-                request = TextSearchRequest(
-                    textQuery = "restaurants",
-                    locationRestriction = LocationRestrictionDto(
-                        circle = CircleDto(
-                            center = LatLngDto(query.center.latitude, query.center.longitude),
-                            radius = query.radiusMeters,
-                        ),
-                    ),
-                    pageSize = NommitConstants.PAGE_SIZE,
-                    pageToken = pageToken,
-                ),
-            )
+            val page = remote.search(query, pageToken)
 
-            response.places.forEach { place ->
+            page.places.forEach { place ->
                 // Paged results can repeat a place across page boundaries.
                 if (seenIds.add(place.id)) {
                     place.toCacheEntity(cacheKey, collected.size)?.let(collected::add)
                 }
             }
 
-            val next = response.nextPageToken
-            if (next.isNullOrBlank() || next == pageToken || response.places.isEmpty()) {
+            val next = page.nextPageToken
+            if (next.isNullOrBlank() || next == pageToken || page.places.isEmpty()) {
                 return collected
             }
             pageToken = next
@@ -114,11 +101,36 @@ class DiscoveryRepositoryImpl @Inject constructor(
         return collected
     }
 
-    private fun httpMessage(code: Int): String = when (code) {
-        401, 403 -> "That API key was turned away. Check it's enabled for Places API (New)."
-        429 -> "Too many searches too fast. Give it a second."
-        in 500..599 -> "Google's having a moment. Try again shortly."
-        else -> "Search failed (HTTP $code)."
+    /**
+     * Distinguishes "billing isn't on" from every other HTTP failure.
+     *
+     * This matters more than it looks: Places API (New) returns *nothing at all*
+     * until a billing account is attached to the key's project, so on a billing-free
+     * project every search fails this way. Reported generically it looks like a dead
+     * network and sends you debugging the wrong thing entirely.
+     */
+    private fun HttpException.toOutcome(): Outcome<Nothing> {
+        val body = runCatching { response()?.errorBody()?.string() }.getOrNull().orEmpty()
+        val looksLikeBilling = BILLING_MARKERS.any { body.contains(it, ignoreCase = true) }
+
+        return when {
+            code() == 402 || (code() == 403 && looksLikeBilling) -> Outcome.Error(
+                message = "Restaurant search needs billing enabled on the Google Cloud project.",
+                cause = this,
+                kind = ErrorKind.Billing,
+            )
+
+            code() == 401 || code() == 403 -> Outcome.Error(
+                message = "That API key was turned away. Check it's enabled for Places API (New).",
+                cause = this,
+            )
+
+            code() == 429 -> Outcome.Error("Too many searches too fast. Give it a second.", this)
+
+            code() in 500..599 -> Outcome.Error("Google's having a moment. Try again shortly.", this)
+
+            else -> Outcome.Error("Search failed (HTTP ${code()}).", this)
+        }
     }
 
     /**
@@ -126,13 +138,9 @@ class DiscoveryRepositoryImpl @Inject constructor(
      * entry (§5e). Without this, a few metres of GPS drift would miss the cache
      * and buy the same result set again.
      *
-     * Radius is bucketed to 100 m for the same reason -- dragging the circle by a
-     * hair shouldn't be a new billable search.
-     *
-     * Selected cuisines are deliberately NOT part of the key, though §5e lists
-     * them: this implementation never sends cuisines to the API (it fetches the
-     * area once and filters in memory), so keying on them would split one cached
-     * result set into a dozen identical copies and buy each of them separately.
+     * Radius is bucketed to 100 m for the same reason. This bucketing is also what
+     * makes the jog slider affordable: it emits continuously while held, but most
+     * of those values collapse onto a cache key already paid for.
      */
     private fun cacheKey(query: SearchQuery): String {
         val grid = NommitConstants.CACHE_GRID_DEGREES
@@ -140,5 +148,16 @@ class DiscoveryRepositoryImpl @Inject constructor(
         val lng = (query.center.longitude / grid).roundToInt()
         val radiusBucket = (query.radiusMeters / 100.0).roundToInt()
         return "$lat:$lng:$radiusBucket"
+    }
+
+    private companion object {
+        /** Substrings Google uses when the project has no billing account. */
+        val BILLING_MARKERS = listOf(
+            "billing",
+            "BILLING_DISABLED",
+            "REQUEST_DENIED",
+            "PERMISSION_DENIED",
+            "consumer",
+        )
     }
 }

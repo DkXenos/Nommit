@@ -20,12 +20,12 @@ data class CachedSearchEntity(
 
 /**
  * A place as returned by the Places API, flattened. Deliberately stores the raw
- * API shapes (the `PRICE_LEVEL_*` enum name, the photo *resource name* rather than
- * a URL) so the cache stays a faithful record of the response and all
+ * API shapes so the cache stays a faithful record of the response and all
  * interpretation happens in the feature's mapper.
  *
- * Photo URLs are built at render time rather than stored because they embed the
- * API key, which must not be written to disk.
+ * Only Essentials-tier fields are stored, because only those are requested -- see
+ * [com.example.nommit.core.network.PlacesFieldMasks.SEARCH]. There are no rating,
+ * price, opening-hours or photo columns to cache.
  */
 @Entity(
     tableName = "cached_place",
@@ -50,12 +50,6 @@ data class CachedPlaceEntity(
     /** Comma-joined Places `types`. A join table would be over-built for a cache. */
     val types: String,
     val primaryType: String?,
-    val primaryTypeDisplayName: String?,
-    val priceLevel: String?,
-    val rating: Double?,
-    val userRatingCount: Int?,
-    val openNow: Boolean?,
-    val photoName: String?,
     /**
      * The API's own ordering, preserved so a cached page renders identically to a
      * fresh one before any client-side sort is applied.

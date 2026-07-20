@@ -67,26 +67,39 @@ object CuisineResolver {
     /**
      * @param primaryType the API's own `primaryType`, trusted first when it is a
      *   cuisine we know -- it is Google's judgement of what the place mainly is.
-     * @param primaryTypeDisplayName Google's localised label, used to name an
-     *   unknown-but-specific type rather than showing it as generic "Eats".
+     *
+     * Google's localised `primaryTypeDisplayName` would be a nicer label for types
+     * we don't recognise, but it sits outside the Essentials field mask, so an
+     * unknown type is title-cased from the raw type string instead.
      */
-    fun resolve(
-        primaryType: String?,
-        primaryTypeDisplayName: String?,
-        types: List<String>,
-    ): Cuisine {
+    fun resolve(primaryType: String?, types: List<String>): Cuisine {
         byType[primaryType]?.let { return it }
 
         // Fall back to the most specific type present, using the declared order.
         cuisineTypes.firstOrNull { (type, _) -> type in types }?.let { return it.second }
 
-        // A specific type we don't have a mapping for still beats "Eats", provided
-        // Google gave us something human-readable to put on the chip.
-        if (!primaryType.isNullOrBlank() && !primaryTypeDisplayName.isNullOrBlank()) {
-            return Cuisine(primaryType, primaryTypeDisplayName)
+        // A specific type we have no mapping for still beats a generic "Eats" chip.
+        if (!primaryType.isNullOrBlank() && primaryType !in genericTypes) {
+            return Cuisine(primaryType, primaryType.toDisplayLabel())
         }
         return generic
     }
+
+    /** "seafood_restaurant" -> "Seafood"; "night_club" -> "Night Club". */
+    private fun String.toDisplayLabel(): String =
+        removeSuffix("_restaurant")
+            .split('_')
+            .filter { it.isNotBlank() }
+            .joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+
+    /** Types that say nothing about the food and should never become a chip. */
+    private val genericTypes = setOf(
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment",
+        "store",
+    )
 
     /** All cuisine keys a place could be filtered under, primary first. */
     fun allCuisines(primaryType: String?, types: List<String>): Set<String> =

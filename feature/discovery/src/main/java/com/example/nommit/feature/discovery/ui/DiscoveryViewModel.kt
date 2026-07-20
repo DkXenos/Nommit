@@ -3,11 +3,9 @@ package com.example.nommit.feature.discovery.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nommit.core.common.NommitConstants
+import com.example.nommit.core.common.ErrorKind
 import com.example.nommit.core.common.Outcome
 import com.example.nommit.core.location.LocationProvider
-import com.example.nommit.core.network.PlacesApiKey
-import com.example.nommit.feature.discovery.data.remote.placePhotoUrl
-import com.example.nommit.feature.discovery.domain.model.PriceLevel
 import com.example.nommit.feature.discovery.domain.model.SearchQuery
 import com.example.nommit.feature.discovery.domain.model.SortMode
 import com.example.nommit.feature.discovery.domain.usecase.FilterAndSortRestaurants
@@ -29,7 +27,6 @@ class DiscoveryViewModel @Inject constructor(
     private val getAvailableCuisines: GetAvailableCuisines,
     private val filterAndSort: FilterAndSortRestaurants,
     private val locationProvider: LocationProvider,
-    @param:PlacesApiKey private val placesApiKey: String,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DiscoveryUiState())
@@ -158,12 +155,7 @@ class DiscoveryViewModel @Inject constructor(
                     val cuisines = getAvailableCuisines(outcome.data)
                     val selected = _state.value.selectedCuisines
                         .intersect(outcome.data.map { it.cuisine.key }.toSet())
-                    val visible = filterAndSort(
-                        outcome.data,
-                        selected,
-                        _state.value.priceFilter,
-                        _state.value.sortMode,
-                    )
+                    val visible = filterAndSort(outcome.data, selected, _state.value.sortMode)
                     // A search that succeeded but whose filters hide everything is
                     // still an empty result as far as the user is concerned.
                     _state.update {
@@ -191,7 +183,14 @@ class DiscoveryViewModel @Inject constructor(
                 }
 
                 is Outcome.Error -> _state.update {
-                    it.copy(phase = DiscoveryPhase.Error, errorMessage = outcome.message)
+                    it.copy(
+                        phase = if (outcome.kind == ErrorKind.Billing) {
+                            DiscoveryPhase.BillingRequired
+                        } else {
+                            DiscoveryPhase.Error
+                        },
+                        errorMessage = outcome.message,
+                    )
                 }
 
                 Outcome.Loading -> Unit
@@ -233,14 +232,6 @@ class DiscoveryViewModel @Inject constructor(
         _state.update { it.copy(sortMode = mode).reapplyFilters() }
     }
 
-    fun onPriceFilterChanged(price: PriceLevel?) {
-        _state.update { current ->
-            // Tapping the active price clears it, matching the comp's toggle.
-            val next = if (current.priceFilter == price) null else price
-            current.copy(priceFilter = next).reapplyFilters()
-        }
-    }
-
     /**
      * Re-derives [DiscoveryUiState.visibleResults] in place. Only meaningful once
      * results exist, so it leaves the Search phase alone -- changing a chip before
@@ -248,7 +239,7 @@ class DiscoveryViewModel @Inject constructor(
      */
     private fun DiscoveryUiState.reapplyFilters(): DiscoveryUiState {
         if (allResults.isEmpty()) return this
-        val visible = filterAndSort(allResults, selectedCuisines, priceFilter, sortMode)
+        val visible = filterAndSort(allResults, selectedCuisines, sortMode)
         val showingResults = phase in setOf(
             DiscoveryPhase.Results,
             DiscoveryPhase.Detail,
@@ -278,13 +269,6 @@ class DiscoveryViewModel @Inject constructor(
     fun onDetailDismissed() {
         _state.update { it.copy(phase = DiscoveryPhase.Results, selectedRestaurantId = null) }
     }
-
-    /**
-     * Photo URLs are built here rather than in the composable so the API key stays
-     * out of the UI layer entirely.
-     */
-    fun photoUrl(photoName: String?, maxWidthPx: Int = 600): String? =
-        photoName?.let { placePhotoUrl(it, placesApiKey, maxWidthPx) }
 
     private companion object {
         const val PROBE_DEBOUNCE_MILLIS = 600L

@@ -37,6 +37,7 @@ import com.example.nommit.feature.discovery.ui.map.MapLayer
 import com.example.nommit.feature.discovery.ui.map.SearchControls
 import com.example.nommit.feature.discovery.ui.map.SearchHeader
 import com.example.nommit.feature.discovery.ui.results.ResultsSheet
+import com.example.nommit.feature.discovery.ui.states.BillingRequiredState
 import com.example.nommit.feature.discovery.ui.states.EmptyState
 import com.example.nommit.feature.discovery.ui.states.ErrorState
 import com.example.nommit.feature.discovery.ui.states.LocationDeniedScreen
@@ -129,11 +130,6 @@ fun DiscoveryScreen(
                         radiusMeters = state.radiusMeters,
                         cuisines = state.availableCuisines,
                         selectedCuisines = state.selectedCuisines,
-                        sortMode = state.sortMode,
-                        priceFilter = state.priceFilter,
-                        photoUrlFor = { viewModel.photoUrl(it.photoName, maxWidthPx = 400) },
-                        onSortChange = viewModel::onSortChanged,
-                        onPriceChange = viewModel::onPriceFilterChanged,
                         onCuisineToggle = viewModel::onCuisineToggled,
                         onRestaurantClick = { viewModel.onRestaurantSelected(it.id) },
                     )
@@ -145,6 +141,10 @@ fun DiscoveryScreen(
                     onWidenRadius = viewModel::onWidenRadius,
                     onBackToMap = viewModel::onBackToMap,
                 )
+            }
+
+            DiscoveryPhase.BillingRequired -> BottomPanel {
+                BillingRequiredState(onBackToMap = viewModel::onBackToMap)
             }
 
             DiscoveryPhase.Error -> BottomPanel {
@@ -175,10 +175,7 @@ fun DiscoveryScreen(
                         if (newDetent != SheetDetent.Full) viewModel.onDetailDismissed()
                     },
                 ) {
-                    DetailSheet(
-                        restaurant = restaurant,
-                        photoUrl = viewModel.photoUrl(restaurant.photoName, maxWidthPx = 800),
-                    )
+                    DetailSheet(restaurant = restaurant)
                 }
             }
         }

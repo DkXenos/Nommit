@@ -2,7 +2,7 @@ package com.example.nommit.core.common
 
 object NommitConstants {
     /** Radius bounds for the draggable circle, in metres. */
-    const val MIN_RADIUS_METERS = 100.0
+    const val MIN_RADIUS_METERS = 200.0
     const val MAX_RADIUS_METERS = 5_000.0
     const val DEFAULT_RADIUS_METERS = 1_200.0
 

@@ -2,7 +2,7 @@ package com.example.nommit.feature.discovery.data;
 
 import com.example.nommit.core.common.DispatcherProvider;
 import com.example.nommit.core.database.SearchCacheDao;
-import com.example.nommit.feature.discovery.data.remote.PlacesService;
+import com.example.nommit.feature.discovery.data.remote.RestaurantRemoteDataSource;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
@@ -27,31 +27,32 @@ import javax.annotation.processing.Generated;
     "nullness:initialization.field.uninitialized"
 })
 public final class DiscoveryRepositoryImpl_Factory implements Factory<DiscoveryRepositoryImpl> {
-  private final Provider<PlacesService> serviceProvider;
+  private final Provider<RestaurantRemoteDataSource> remoteProvider;
 
   private final Provider<SearchCacheDao> cacheDaoProvider;
 
   private final Provider<DispatcherProvider> dispatchersProvider;
 
-  private DiscoveryRepositoryImpl_Factory(Provider<PlacesService> serviceProvider,
+  private DiscoveryRepositoryImpl_Factory(Provider<RestaurantRemoteDataSource> remoteProvider,
       Provider<SearchCacheDao> cacheDaoProvider, Provider<DispatcherProvider> dispatchersProvider) {
-    this.serviceProvider = serviceProvider;
+    this.remoteProvider = remoteProvider;
     this.cacheDaoProvider = cacheDaoProvider;
     this.dispatchersProvider = dispatchersProvider;
   }
 
   @Override
   public DiscoveryRepositoryImpl get() {
-    return newInstance(serviceProvider.get(), cacheDaoProvider.get(), dispatchersProvider.get());
+    return newInstance(remoteProvider.get(), cacheDaoProvider.get(), dispatchersProvider.get());
   }
 
-  public static DiscoveryRepositoryImpl_Factory create(Provider<PlacesService> serviceProvider,
+  public static DiscoveryRepositoryImpl_Factory create(
+      Provider<RestaurantRemoteDataSource> remoteProvider,
       Provider<SearchCacheDao> cacheDaoProvider, Provider<DispatcherProvider> dispatchersProvider) {
-    return new DiscoveryRepositoryImpl_Factory(serviceProvider, cacheDaoProvider, dispatchersProvider);
+    return new DiscoveryRepositoryImpl_Factory(remoteProvider, cacheDaoProvider, dispatchersProvider);
   }
 
-  public static DiscoveryRepositoryImpl newInstance(PlacesService service, SearchCacheDao cacheDao,
-      DispatcherProvider dispatchers) {
-    return new DiscoveryRepositoryImpl(service, cacheDao, dispatchers);
+  public static DiscoveryRepositoryImpl newInstance(RestaurantRemoteDataSource remote,
+      SearchCacheDao cacheDao, DispatcherProvider dispatchers) {
+    return new DiscoveryRepositoryImpl(remote, cacheDao, dispatchers);
   }
 }

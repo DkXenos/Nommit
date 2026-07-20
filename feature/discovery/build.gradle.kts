@@ -42,9 +42,6 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
 
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)

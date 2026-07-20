@@ -18,17 +18,6 @@ val localProps = Properties().apply {
 val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY").orEmpty().trim()
 val placesApiKey: String = localProps.getProperty("PLACES_API_KEY").orEmpty().trim()
 
-// A missing key fails at runtime as a blank grey map and an opaque 401, which is a
-// miserable thing to debug. Say so at build time instead.
-listOf("MAPS_API_KEY" to mapsApiKey, "PLACES_API_KEY" to placesApiKey).forEach { (name, value) ->
-    when {
-        value.isEmpty() ->
-            logger.warn("Nommit: $name is not set in local.properties -- maps and search will not work.")
-        !value.startsWith("AIza") ->
-            logger.warn("Nommit: $name doesn't look like a Google API key (expected it to start with \"AIza\").")
-    }
-}
-
 android {
     namespace = "com.example.nommit"
     compileSdk = 37
@@ -99,9 +88,6 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
-
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
