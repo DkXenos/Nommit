@@ -59,7 +59,12 @@ fun DraggableSheet(
     detent: SheetDetent,
     onDetentChange: (SheetDetent) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    /**
+     * Receives the drag modifier so content can widen the grabbable area beyond the
+     * handle strip. Apply it to whatever is inert -- headers, labels, padding -- but
+     * never to a scrolling list, which needs its own vertical gesture.
+     */
+    content: @Composable (dragModifier: Modifier) -> Unit,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val heightPx = constraints.maxHeight.toFloat()
@@ -78,6 +83,35 @@ fun DraggableSheet(
             label = "sheetTop",
         )
 
+        // One gesture definition, applied to every surface that should drag: the
+        // handle strip here, plus whatever inert areas the content opts in.
+        //
+        // Sharing a Modifier across nodes is safe -- Modifier is immutable, and each
+        // node gets its own pointer-input instance driving this same state.
+        //
+        // Taps still reach children underneath. `detectVerticalDragGestures` runs on
+        // the Main pass, where children see events first, and a `clickable` child
+        // consumes the press but never the movement -- so a chip inside a draggable
+        // header still toggles on tap while a drag from that same chip moves the sheet.
+        val dragModifier = Modifier.pointerInput(heightPx, detent) {
+            detectVerticalDragGestures(
+                onDragStart = { dragFraction = detent.topFraction },
+                onVerticalDrag = { change, delta ->
+                    change.consume()
+                    dragFraction = (dragFraction + delta / heightPx)
+                        .coerceIn(SheetDetent.Full.topFraction, 0.9f)
+                },
+                onDragEnd = {
+                    val settled = SheetDetent.entries.minByOrNull {
+                        abs(it.topFraction - dragFraction)
+                    } ?: detent
+                    dragFraction = Float.NaN
+                    onDetentChange(settled)
+                },
+                onDragCancel = { dragFraction = Float.NaN },
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -86,38 +120,20 @@ fun DraggableSheet(
                 .background(NommitColors.Cream)
                 .drawTopBorder(),
         ) {
-            // Drag handle. Only this strip is draggable -- the card list below owns
-            // its own vertical scrolling, and stealing that would make the list
-            // impossible to scroll at the Full detent.
+            // The chili strip stays as the signpost: it is the one place that is
+            // unambiguously a handle, and it reads as grabbable before you touch it.
+            // The rest of the grabbable area is discovered by trying, which is fine
+            // as a bonus but would be a poor primary affordance on its own.
             //
-            // Because only this strip responds, it is painted chili rather than left
-            // as bare paper: a grey pill on a cream sheet gave no clue where the
-            // gesture worked, so drags started on the cards and silently did nothing.
-            // The coloured band is the affordance -- it shows the reachable zone, and
-            // the 34dp height clears the ~28dp minimum for a comfortable touch target.
+            // 52dp rather than the ~28dp minimum: at handle-strip height the zone read
+            // as a decorative rule rather than a grabbable band, so it gets enough
+            // height to look like a target you aim at.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(34.dp)
+                    .height(52.dp)
                     .background(NommitColors.Chili)
-                    .pointerInput(heightPx, detent) {
-                        detectVerticalDragGestures(
-                            onDragStart = { dragFraction = detent.topFraction },
-                            onVerticalDrag = { change, delta ->
-                                change.consume()
-                                dragFraction = (dragFraction + delta / heightPx)
-                                    .coerceIn(SheetDetent.Full.topFraction, 0.9f)
-                            },
-                            onDragEnd = {
-                                val settled = SheetDetent.entries.minByOrNull {
-                                    abs(it.topFraction - dragFraction)
-                                } ?: detent
-                                dragFraction = Float.NaN
-                                onDetentChange(settled)
-                            },
-                            onDragCancel = { dragFraction = Float.NaN },
-                        )
-                    },
+                    .then(dragModifier),
                 contentAlignment = Alignment.Center,
             ) {
                 // Cream pill on chili: a double chevron would say "drag" more
@@ -131,7 +147,7 @@ fun DraggableSheet(
                 )
             }
 
-            content()
+            content(dragModifier)
         }
     }
 }

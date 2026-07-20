@@ -144,7 +144,7 @@ fun DiscoveryScreen(
                     DraggableSheet(
                         detent = sheetDetent,
                         onDetentChange = { sheetDetent = it },
-                    ) {
+                    ) { dragModifier ->
                         ResultsSheet(
                             results = state.visibleResults,
                             radiusMeters = state.radiusMeters,
@@ -153,6 +153,8 @@ fun DiscoveryScreen(
                             onCuisineToggle = viewModel::onCuisineToggled,
                             onRestaurantClick = { viewModel.onRestaurantSelected(it.id) },
                             photoUrlFor = { viewModel.photoUrl(it.photoName, maxWidthPx = 400) },
+                            onNewSearch = viewModel::onBackToMap,
+                            dragModifier = dragModifier,
                         )
                     }
                 }
@@ -200,7 +202,7 @@ fun DiscoveryScreen(
                         // it -- there is no back button in the comp.
                         if (newDetent != SheetDetent.Full) viewModel.onDetailDismissed()
                     },
-                ) {
+                ) { _ ->
                     DetailSheet(
                         restaurant = restaurant,
                         photoUrl = viewModel.photoUrl(restaurant.photoName, maxWidthPx = 900),

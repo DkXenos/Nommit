@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.nommit.core.common.formatDistance
+import com.example.nommit.core.ui.component.ZineButton
 import com.example.nommit.core.ui.component.ZineCuisineChip
 import com.example.nommit.core.ui.component.rememberDealIn
 import com.example.nommit.core.ui.component.ZinePhotoTile
@@ -52,10 +53,26 @@ fun ResultsSheet(
     onCuisineToggle: (String) -> Unit,
     onRestaurantClick: (Restaurant) -> Unit,
     photoUrlFor: (Restaurant) -> String?,
+    /** Returns to the search phase so the radius can be changed and re-nommed. */
+    onNewSearch: () -> Unit,
     modifier: Modifier = Modifier,
+    /**
+     * Applied to the header block so the whole inert top of the sheet drags, not
+     * just the handle strip. Deliberately NOT applied to the card list below: that
+     * owns its own vertical scrolling, and stealing it would make the list
+     * unscrollable at the Full detent.
+     */
+    dragModifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
+        // The count, the "nearest first" label and the space around the chips are all
+        // inert, so they drag. The chips themselves stay tappable -- a clickable child
+        // consumes the press but not the movement, so a tap toggles and a drag moves.
+        Column(
+            modifier = Modifier
+                .then(dragModifier)
+                .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+        ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = "${results.size} spots",
@@ -68,6 +85,25 @@ fun ResultsSheet(
                     style = NommitType.Stamp,
                     color = NommitColors.Chili,
                 )
+
+                Spacer(Modifier.weight(1f))
+
+                // The only way back to the radius control. Without it the search
+                // phase is a one-way door: once you nom, the dial is unreachable and
+                // the app has to be restarted to look at a different radius.
+                ZineButton(
+                    onClick = onNewSearch,
+                    containerColor = NommitColors.Turmeric,
+                    contentColor = NommitColors.Ink,
+                    textStyle = NommitType.Chip,
+                    shadowOffset = Zine.ShadowTiny,
+                    cornerRadius = Zine.RadiusTag,
+                    contentPadding = 8.dp,
+                    tilt = Zine.TILT_SUBTLE,
+                ) {
+                    Text("↺")
+                    Text("new search")
+                }
             }
 
             Spacer(Modifier.height(4.dp))
